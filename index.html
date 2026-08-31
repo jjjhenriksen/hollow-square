@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A browser-playable Sacred Harp horror game about song, memory, and the class that remains.">
+  <title>Hollow Square — a Sacred Harp horror game</title>
+  <link rel="stylesheet" href="styles.css?v=7">
+</head>
+<body>
+  <div class="ambient ambient-left" aria-hidden="true"></div>
+  <div class="ambient ambient-right" aria-hidden="true"></div>
+
+  <header class="masthead">
+    <a class="wordmark" href="#title" data-action="home">the fleet / <span>hollow square</span></a>
+    <div class="masthead-tools">
+      <span class="sound-note">headphones recommended</span>
+      <button class="text-button" type="button" data-action="open-settings">assistance</button>
+    </div>
+  </header>
+
+  <main id="app" tabindex="-1">
+    <section class="screen title-screen is-active" id="title" aria-labelledby="title-heading">
+      <div class="title-layout">
+        <div class="legacy-frame">
+          <div class="title-copy">
+            <div class="smallcaps">the</div>
+            <h1 id="title-heading">HOLLOW SQUARE</h1>
+            <hr class="rule short">
+            <div class="sub">— being —</div>
+            <div class="decl smallcaps">
+              a collection of sacred songs, odes and anthems ;<br>
+              set forth in the four patent shapes ,<br>
+              for the use of singing schools and of<br>
+              <b>THE CLASS THAT REMAINS</b>
+            </div>
+            <hr class="rule">
+            <div class="decl legacy-italic">together with certain tunes which are not<br>to be sung by the living.</div>
+            <hr class="rule dbl">
+            <div class="decl smallcaps legacy-meta">compiled in western georgia &nbsp;·&nbsp; first published 1844<br>this copy bears no date</div>
+            <div class="choice-grid" aria-label="Choose how to begin">
+              <button class="choice choice-primary" type="button" data-action="open-school"><span class="choice-label">Attend Singing School</span></button>
+              <button class="choice" type="button" data-action="open-book"><span class="choice-label">Open the Book</span></button>
+            </div>
+            <div class="keys-hint smallcaps">headphones recommended &nbsp;·&nbsp; keys: F · S · L · M</div>
+            <div class="warn">If you hear singing through the pines, you are already expected.</div>
+          </div>
+          <div class="title-plate" aria-label="An ink drawing of a rural singing-school room with a songbook and a candle">
+            <img src="assets/hollow-square-vignette.png" alt="">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen story-screen" id="story" aria-labelledby="story-heading" hidden>
+      <div class="story-wrap">
+        <p class="eyebrow" id="story-kicker">providence chapel · morning session</p>
+        <h2 id="story-heading">The class is waiting.</h2>
+        <figure class="story-illustration" aria-label="An ink illustration from the songbook">
+          <img id="story-illustration" src="assets/story-01-meetinghouse.jpg" alt="">
+        </figure>
+        <div class="story-text" id="story-text"></div>
+        <div class="story-actions">
+          <button class="button button-primary" type="button" data-action="begin-lesson">Take your place</button>
+          <button class="text-button" id="story-reference-button" type="button" data-action="open-reference">consult your copy</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen practice-screen" id="practice" aria-labelledby="practice-heading" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">optional mode · no consequences</p>
+          <h2 id="practice-heading">Singing School</h2>
+        </div>
+        <button class="text-button" type="button" data-action="home">close the book</button>
+      </div>
+      <p class="section-lede">Learn the four patent shapes, hear short tenor openings, and repeat a phrase until the eye and ear agree. Nothing in this room follows you into the book.</p>
+      <div class="shape-reference" aria-label="Four-shape notation reference">
+        <div class="shape-card"><span class="shape-mark fa" aria-hidden="true"></span><strong>fa</strong><small>degrees 1 &amp; 4</small></div>
+        <div class="shape-card"><span class="shape-mark sol" aria-hidden="true"></span><strong>sol</strong><small>degrees 2 &amp; 5</small></div>
+        <div class="shape-card"><span class="shape-mark la" aria-hidden="true"></span><strong>la</strong><small>degrees 3 &amp; 6</small></div>
+        <div class="shape-card"><span class="shape-mark mi" aria-hidden="true"></span><strong>mi</strong><small>degree 7</small></div>
+      </div>
+      <div class="scale-note"><span>major</span> fa · sol · la · fa · sol · la · mi · fa <span>minor</span> la · mi · fa · sol · la · fa · sol · la</div>
+      <div class="practice-list" id="practice-list"></div>
+      <p class="quiet-note">The campaign keeps its silences. Practice examples stay here.</p>
+    </section>
+
+    <section class="screen game-screen" id="game" aria-labelledby="game-heading" hidden>
+      <div class="game-topline">
+        <span id="game-session">morning session</span>
+        <span id="game-progress">page 45t · 1 / 11</span>
+        <button class="text-button" type="button" data-action="open-reference" id="game-reference-button" hidden>reference</button>
+      </div>
+      <div class="game-heading">
+        <div>
+          <p class="eyebrow" id="game-page">45t</p>
+          <h2 id="game-heading">NEW BRITAIN.</h2>
+          <p class="tune-meta" id="game-meta">C. M. · Arr. The Southern Harmony, 1835.</p>
+        </div>
+        <div class="bench-state" aria-label="Voices remaining">
+          <div class="bench-state-heading">
+            <span class="bench-label">the hollow square</span>
+            <span class="bench-risk" id="bench-risk" aria-live="polite">3 misses before a bench falls</span>
+          </div>
+          <div class="hollow-square-map" id="bench-dots" role="img" aria-label="The hollow square of four singing benches"></div>
+        </div>
+      </div>
+
+      <div class="book-panel">
+        <div class="book-margin" aria-hidden="true"></div>
+        <div class="staff-wrap">
+          <div class="staff" id="staff" role="img" aria-label="Short shape-note phrase"></div>
+          <p class="lyric" id="lyric">Amazing grace! how sweet the sound, That saved a wretch like me!</p>
+        </div>
+      </div>
+
+      <div class="harmony-tools" id="harmony-tools" aria-label="Four-part harmony controls" hidden>
+        <button class="button button-quiet" type="button" data-action="play-harmony" id="harmony-play-button">hear the four parts</button>
+        <button class="text-button" type="button" data-action="toggle-harmony" id="harmony-view-button">show the parts</button>
+        <span class="harmony-status" id="harmony-status">the class is four-part</span>
+      </div>
+      <div class="harmony-plate" id="harmony-plate" hidden></div>
+
+      <div class="game-feedback" aria-live="polite" aria-atomic="true" id="prompt">The class sings first. Listen.</div>
+      <p class="first-play-cue" id="first-play-cue" hidden>When the class falls silent, choose the syllable you heard.</p>
+
+      <div class="game-controls">
+        <div class="shape-keys" id="shape-keys" aria-label="Sing a shape"></div>
+        <div class="utility-controls">
+          <button class="button button-quiet" type="button" data-action="replay" id="replay-button">hear the class again</button>
+          <button class="text-button" type="button" data-action="open-settings">assistance</button>
+        </div>
+      </div>
+      <div class="game-footer"><span id="silence-hint" hidden>space keeps silent notes</span></div>
+    </section>
+
+    <section class="screen end-screen" id="end" aria-labelledby="end-heading" hidden>
+      <div class="end-mark" id="end-mark" aria-hidden="true">✦</div>
+      <p class="eyebrow" id="end-kicker">the closing</p>
+      <h2 id="end-heading">The class sings on.</h2>
+      <div class="story-text" id="end-text"></div>
+      <div class="story-actions">
+        <button class="button button-primary" type="button" data-action="restart">open the book again</button>
+        <button class="text-button" type="button" data-action="open-school">visit singing school</button>
+      </div>
+    </section>
+  </main>
+
+  <aside class="drawer" id="settings-drawer" aria-labelledby="settings-heading" hidden>
+    <div class="drawer-scrim" data-action="close-drawer"></div>
+    <div class="drawer-panel" role="dialog" aria-modal="true">
+      <div class="drawer-heading"><div><p class="eyebrow">optional assistance</p><h2 id="settings-heading">Keep your place.</h2></div><button class="close-button" type="button" aria-label="Close assistance" data-action="close-drawer">×</button></div>
+      <p class="drawer-copy">The default copy expects memory. These settings add training wheels without changing the songbook or the consequences of the unplayed note.</p>
+      <form id="settings-form" class="settings-form">
+        <label><span>Notes during recall</span><select name="visibility"><option value="standard">fade after the class sings</option><option value="longer">leave them a little longer</option><option value="always">never hide the notes</option></select></label>
+        <label><span>Wrong answers</span><select name="mercy"><option value="3">three before a bench falls</option><option value="4">four before a bench falls</option></select></label>
+        <label class="check-row"><input type="checkbox" name="hints"><span>Let the margin offer a hint after two misses</span></label>
+        <label class="check-row"><input type="checkbox" name="reducedMemory"><span>Use a shorter memory phrase</span></label>
+      </form>
+      <p class="drawer-foot">Settings are saved on this device. Singing School is always consequence-free.</p>
+    </div>
+  </aside>
+
+  <aside class="reference-card" id="reference-card" aria-labelledby="reference-heading" hidden>
+    <div class="drawer-scrim" data-action="close-reference"></div>
+    <div class="reference-panel" role="dialog" aria-modal="true">
+      <div class="drawer-heading"><div><p class="eyebrow">marginalia</p><h2 id="reference-heading">The real book</h2></div><button class="close-button" type="button" aria-label="Close reference" data-action="close-reference">×</button></div>
+      <div class="reference-content"><p class="reference-tune" id="reference-tune">45t · NEW BRITAIN.</p><p id="reference-body">This game uses the number and title as a place to look up in your own Sacred Harp. The fragment on screen is intentionally short; consult the printed page when the class has gone quiet.</p><p class="reference-details" id="reference-details">3/4 · C. M. · C Major</p><p class="quiet-note">No invented answer is hidden here. The reference is meant to be outside the square.</p></div>
+    </div>
+  </aside>
+
+  <script src="vendor/opensheetmusicdisplay.min.js"></script>
+  <script src="harmony-data.js?v=4"></script>
+  <script src="app.js?v=5"></script>
+</body>
+</html>
