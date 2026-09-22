@@ -84,7 +84,7 @@ const TUNES = [
 const state = {
   mode: 'campaign', screen: 'title', songIndex: 0, cursor: 0, phase: 'idle',
   mistakes: 0, totalMistakes: 0, wrongHere: 0, lost: [], playToken: 0, notationToken: 0,
-  settings: loadSettings(), hideAt: 0, referenceUnlocked: false, harmonyUnlocked: false, harmonyPreviewToken: 0
+  settings: loadSettings(), hideAt: 0, referenceUnlocked: false, harmonyUnlocked: false, harmonyPreviewToken: 0, audio: null
 };
 
 function loadSettings() {
@@ -557,12 +557,32 @@ function renderStaff() {
 }
 
 function initAudio() {
-  if (!window.AudioContext && !window.webkitAudioContext) return;
-  if (!state.audio) {
-    const AudioCtor = window.AudioContext || window.webkitAudioContext;
-    state.audio = new AudioCtor();
+  const status = $('#audio-status');
+  const setStatus = (message, stateName) => {
+    if (!status) return;
+    status.textContent = message;
+    status.dataset.state = stateName;
+  };
+  if (!window.AudioContext && !window.webkitAudioContext) {
+    setStatus('sound unavailable · use the on-screen cues', 'unavailable');
+    return false;
   }
-  if (state.audio.state === 'suspended') state.audio.resume();
+  try {
+    if (!state.audio) {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      state.audio = new AudioCtor();
+    }
+    if (state.audio.state === 'suspended') {
+      const resume = state.audio.resume();
+      if (resume?.catch) resume.catch(() => setStatus('sound blocked · use the on-screen cues', 'blocked'));
+    }
+    if (state.audio.state === 'running') setStatus('sound ready · optional', 'ready');
+    else if (state.audio.state === 'suspended') setStatus('sound blocked · use the on-screen cues', 'blocked');
+    return true;
+  } catch (_) {
+    setStatus('sound unavailable · use the on-screen cues', 'unavailable');
+    return false;
+  }
 }
 const ORGAN_PARTIALS = [[.5, .34, 'sine'], [1, .52, 'sine'], [2, .18, 'sine'], [3, .1, 'triangle'], [4, .06, 'sine']];
 function organTone(frequency, duration, offset = 0, gain = .035) {

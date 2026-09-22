@@ -320,6 +320,10 @@ h1 em { color: inherit; font-style: normal; }
 .shape-key { min-height: 64px; border: 1px solid rgba(36,28,18,.45); background: rgba(255,255,255,.08); }
 .button-quiet { border: 1.5px solid #241c12; }
 .game-footer { width: 100%; margin-top: 16px; }
+#audio-status, #audio-guidance { display: block; margin-top: 5px; }
+#audio-status[data-state="ready"] { color: var(--forest); }
+#audio-status[data-state="blocked"], #audio-status[data-state="unavailable"] { color: var(--oxblood); }
+#audio-guidance { color: var(--muted); }
 
 .end-screen { display: grid; align-content: center; background: radial-gradient(ellipse 120% 90% at 50% 30%, #e8dcc0 0%, #d8c9a6 85%, #c4b28d 100%); }
 .end-screen h2 { width: 100%; }
