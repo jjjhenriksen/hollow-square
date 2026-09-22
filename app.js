@@ -16,6 +16,22 @@ const SHAPES = {
   rest: { key: 'SPACE', label: 'keep silent', className: 'rest' }
 };
 const ATLAS_BASE_URL = 'https://shapenote.jacquelinehenriksen.com/atlas/';
+const OSMD_SCRIPT_URL = 'vendor/opensheetmusicdisplay.min.js';
+let osmdLoadPromise;
+
+function loadOsmd() {
+  if (window.opensheetmusicdisplay?.OpenSheetMusicDisplay) return Promise.resolve(true);
+  if (osmdLoadPromise) return osmdLoadPromise;
+  osmdLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = OSMD_SCRIPT_URL;
+    script.async = true;
+    script.onload = () => resolve(Boolean(window.opensheetmusicdisplay?.OpenSheetMusicDisplay));
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+  return osmdLoadPromise;
+}
 
 function mod7(value) { return ((value % 7) + 7) % 7; }
 function syllableOf(degree) { return SYLLABLES[mod7(degree)]; }
@@ -486,7 +502,7 @@ function renderInkBlots(container, notes, tune, shouldShow) {
 }
 
 async function renderOsmdStaff(container, notes, tune, shouldShow, renderToken) {
-  if (!window.opensheetmusicdisplay?.OpenSheetMusicDisplay) return false;
+  if (!await loadOsmd()) return false;
   const osmd = new window.opensheetmusicdisplay.OpenSheetMusicDisplay(container);
   osmd.setOptions({ backend: 'svg', drawTitle: false, drawComposer: false, drawPartNames: true, drawMeasureNumbers: false, drawLyrics: false, drawingParameters: 'compacttight', pageFormat: 'Endless' });
   await osmd.load(musicXmlForTune(notes, tune));

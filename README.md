@@ -16,6 +16,18 @@ Open <http://localhost:8000> after the server starts.
 
 No package installation or build step is required.
 
+## Performance check
+
+The title screen defers the vendored notation renderer until a playable phrase
+is entered. To inspect the static payload locally, run:
+
+```sh
+du -h vendor/opensheetmusicdisplay.min.js assets/* | sort -h
+```
+
+Story illustrations use lazy loading after the initial page. Keep new artwork
+compressed and prefer responsive formats when adding assets.
+
 ## Credits
 
 The notation renderer is the locally vendored [OpenSheetMusicDisplay](https://github.com/opensheetmusicdisplay/opensheetmusicdisplay) runtime. Review its upstream BSD-3-Clause license and the rights for the included artwork before redistributing this project.
