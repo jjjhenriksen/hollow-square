@@ -141,7 +141,13 @@ function showScreen(name) {
   Object.entries(screens).forEach(([key, node]) => { node.hidden = key !== name; node.classList.toggle('is-active', key === name); });
   state.screen = name;
   document.body.classList.toggle('on-title', name === 'title');
-  $('#app').focus({ preventScroll: true });
+  const heading = screens[name]?.querySelector('h1, h2');
+  if (heading) {
+    heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
+  } else {
+    $('#app').focus({ preventScroll: true });
+  }
 }
 
 function storyFor(index) {
@@ -198,13 +204,40 @@ function saveSettings() {
   renderStaff();
 }
 
+let activeDialog = null;
+const dialogInvokers = new Map();
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function setPageModalState(isModal) {
+  const app = $('#app');
+  const masthead = $('.masthead');
+  [app, masthead].forEach(node => {
+    if (!node) return;
+    node.inert = isModal;
+    node.setAttribute('aria-hidden', isModal ? 'true' : 'false');
+  });
+}
+
 function openDrawer(id) {
   updateSettingsForm();
+  const invoker = document.activeElement;
+  if (invoker && invoker !== document.body) dialogInvokers.set(id, invoker);
   $(id).hidden = false;
+  activeDialog = id;
+  setPageModalState(true);
   const close = $(id).querySelector('.close-button');
   if (close) close.focus();
 }
-function closeDrawer(id) { $(id).hidden = true; }
+function closeDrawer(id) {
+  const dialog = $(id);
+  if (!dialog || dialog.hidden) return;
+  dialog.hidden = true;
+  if (activeDialog === id) activeDialog = null;
+  setPageModalState(false);
+  const invoker = dialogInvokers.get(id);
+  dialogInvokers.delete(id);
+  if (invoker?.isConnected) invoker.focus({ preventScroll: true });
+}
 
 function updateReference() {
   const tune = currentTune();
@@ -218,7 +251,7 @@ function updateReference() {
   atlasLink.href = atlasUrl.href;
 }
 
-function openReference() { updateReference(); $('#reference-card').hidden = false; $('#reference-card .close-button').focus(); }
+function openReference() { updateReference(); openDrawer('#reference-card'); }
 
 function buildShapeKeys() {
   const wrap = $('#shape-keys');
@@ -787,7 +820,27 @@ document.addEventListener('click', event => {
 });
 
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') { closeDrawer('#settings-drawer'); closeDrawer('#reference-card'); }
+  if (activeDialog) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeDrawer(activeDialog);
+      return;
+    }
+    if (event.key === 'Tab') {
+      const dialog = $(activeDialog);
+      const focusable = [...dialog.querySelectorAll(FOCUSABLE)].filter(node => node.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  }
   if (event.repeat) return;
   if (state.screen !== 'game') return;
   const key = event.key.toLowerCase();
