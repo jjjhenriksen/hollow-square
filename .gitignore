@@ -4,3 +4,6 @@ Thumbs.db
 node_modules/
 work/
 outputs/
+.playwright-cli/
+test-results/
+playwright-report/
