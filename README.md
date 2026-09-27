@@ -44,6 +44,13 @@ npx playwright install chromium
 npm test
 ```
 
+## Security boundary
+
+`index.html` applies a Content Security Policy to restrict scripts and resource
+loads. This meta-delivered policy cannot enforce `frame-ancestors` or set
+response-only security headers; those protections must be configured by the
+publishing host.
+
 ## Credits
 
 The notation renderer is the locally vendored [OpenSheetMusicDisplay](https://github.com/opensheetmusicdisplay/opensheetmusicdisplay) runtime. Review its upstream BSD-3-Clause license before redistributing this project. The title and story drawings are authored in `artwork.js`.
