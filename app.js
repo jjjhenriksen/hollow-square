@@ -644,11 +644,21 @@ function initAudio() {
       state.audio = new AudioCtor();
     }
     if (state.audio.state === 'suspended') {
-      const resume = state.audio.resume();
-      if (resume?.catch) resume.catch(() => setStatus('sound blocked · use the on-screen cues', 'blocked'));
+      const audio = state.audio;
+      const resume = audio.resume();
+      if (resume?.then) {
+        setStatus('sound starting · optional', 'starting');
+        resume.then(() => {
+          if (state.audio !== audio) return;
+          const ready = audio.state === 'running';
+          setStatus(ready ? 'sound ready · optional' : 'sound blocked · use the on-screen cues', ready ? 'ready' : 'blocked');
+        }).catch(() => {
+          if (state.audio === audio) setStatus('sound blocked · use the on-screen cues', 'blocked');
+        });
+      }
     }
     if (state.audio.state === 'running') setStatus('sound ready · optional', 'ready');
-    else if (state.audio.state === 'suspended') setStatus('sound blocked · use the on-screen cues', 'blocked');
+    else if (state.audio.state === 'suspended' && status?.dataset.state !== 'starting') setStatus('sound blocked · use the on-screen cues', 'blocked');
     return true;
   } catch (_) {
     setStatus('sound unavailable · use the on-screen cues', 'unavailable');
