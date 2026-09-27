@@ -124,6 +124,55 @@ test('audio status stays visible on a phrase without a rest', async ({ page }) =
   await expect(page.locator('#audio-guidance')).toBeVisible();
 });
 
+test('audio status updates when a suspended context resumes asynchronously', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.AudioContext = class {
+      constructor() {
+        this.state = 'suspended';
+        this.resumePromise = new Promise(resolve => {
+          window.completeAudioResume = () => {
+            this.state = 'running';
+            resolve();
+          };
+        });
+      }
+      resume() { return this.resumePromise; }
+    };
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open the Book' }).click();
+  await page.getByRole('button', { name: 'Take your place' }).click();
+  const status = page.locator('#audio-status');
+  await expect(status).toHaveAttribute('data-state', 'starting');
+  await page.evaluate(() => window.completeAudioResume());
+  await expect(status).toHaveAttribute('data-state', 'ready');
+  await expect(status).toHaveText('sound ready · optional');
+  await page.locator('header [data-action="home"]').click();
+});
+
+test('audio status retains the fallback when asynchronous resume is rejected', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.AudioContext = class {
+      constructor() {
+        this.state = 'suspended';
+        this.resumePromise = new Promise((resolve, reject) => {
+          window.rejectAudioResume = () => reject(new Error('audio remains unavailable'));
+        });
+      }
+      resume() { return this.resumePromise; }
+    };
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open the Book' }).click();
+  await page.getByRole('button', { name: 'Take your place' }).click();
+  const status = page.locator('#audio-status');
+  await expect(status).toHaveAttribute('data-state', 'starting');
+  await page.evaluate(() => window.rejectAudioResume());
+  await expect(status).toHaveAttribute('data-state', 'blocked');
+  await expect(status).toContainText('use the on-screen cues');
+  await page.locator('header [data-action="home"]').click();
+});
+
 test('the harmony plate renders the source four-part notation', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Attend Singing School' }).click();
