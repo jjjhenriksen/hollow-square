@@ -14,7 +14,7 @@
 
 * { box-sizing: border-box; }
 html { background: var(--night); color-scheme: dark; }
-body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--night); color: var(--paper); font-family: var(--sans); }
+body { margin: 0; min-width: 280px; min-height: 100vh; background: var(--night); color: var(--paper); font-family: var(--sans); }
 button, select { font: inherit; }
 button { cursor: pointer; }
 button:focus-visible, a:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--brass); outline-offset: 4px; }
@@ -502,7 +502,7 @@ h1 em { color: inherit; font-style: normal; }
 .staff-note-label { display: block; }
 
 .harmony-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin: 14px 0 0; }
-.harmony-tools .button { min-height: 36px; padding: 7px 12px; }
+.harmony-tools .button { min-height: 36px; min-width: 0; max-width: 100%; padding: 7px 12px; }
 .harmony-status { color: var(--muted); font-family: var(--serif); font-size: 12px; }
 .harmony-plate { margin: 16px 0 0; padding: 12px 10px 8px; border: 1px solid rgba(33, 23, 15, .55); background: rgba(235, 207, 153, .38); overflow-x: auto; }
 .harmony-engraving { display: block; width: 100%; min-width: 680px; height: auto; color: var(--ink); }
