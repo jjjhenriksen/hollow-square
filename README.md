@@ -19,15 +19,31 @@ No package installation or build step is required.
 ## Performance check
 
 The title screen defers the vendored notation renderer until a playable phrase
-is entered. To inspect the static payload locally, run:
+is entered. The title vignette and eleven story scenes are generated as small,
+deterministic SVG drawings by `artwork.js`; edit the scene geometry and shared
+paper, forest-green, rust-red, and brass palette there. Sons of Sorrow reuses
+the heavy-book scene. The story inventory is meetinghouse, wrong pages,
+thumbprint, empty chair, pencil note, floorboards, heavy book, three benches,
+closed leader book, wrong shadow, and place in the square. No bitmap artwork
+is loaded. To inspect the static payload locally, run:
 
 ```sh
-du -h vendor/opensheetmusicdisplay.min.js assets/* | sort -h
+du -h vendor/opensheetmusicdisplay.min.js artwork.js | sort -h
 ```
 
-Story illustrations use lazy loading after the initial page. Keep new artwork
-compressed and prefer responsive formats when adding assets.
+Programmatic artwork is static and has no offscreen animation to clean up.
+
+## Regression checks
+
+Install the development dependencies and Chromium, then run the browser and
+notation checks:
+
+```sh
+npm ci
+npx playwright install chromium
+npm test
+```
 
 ## Credits
 
-The notation renderer is the locally vendored [OpenSheetMusicDisplay](https://github.com/opensheetmusicdisplay/opensheetmusicdisplay) runtime. Review its upstream BSD-3-Clause license and the rights for the included artwork before redistributing this project.
+The notation renderer is the locally vendored [OpenSheetMusicDisplay](https://github.com/opensheetmusicdisplay/opensheetmusicdisplay) runtime. Review its upstream BSD-3-Clause license before redistributing this project. The title and story drawings are authored in `artwork.js`.

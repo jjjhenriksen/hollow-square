@@ -22,13 +22,28 @@ let osmdLoadPromise;
 function loadOsmd() {
   if (window.opensheetmusicdisplay?.OpenSheetMusicDisplay) return Promise.resolve(true);
   if (osmdLoadPromise) return osmdLoadPromise;
+  const existingFailedScript = document.querySelector(`script[src="${OSMD_SCRIPT_URL}"][data-load-failed="true"]`);
+  existingFailedScript?.remove();
+  const script = document.createElement('script');
+  script.src = OSMD_SCRIPT_URL;
+  script.async = true;
   osmdLoadPromise = new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = OSMD_SCRIPT_URL;
-    script.async = true;
-    script.onload = () => resolve(Boolean(window.opensheetmusicdisplay?.OpenSheetMusicDisplay));
-    script.onerror = reject;
+    script.onload = () => {
+      if (window.opensheetmusicdisplay?.OpenSheetMusicDisplay) resolve(true);
+      else {
+        script.dataset.loadFailed = 'true';
+        reject(new Error('The notation renderer did not initialize'));
+      }
+    };
+    script.onerror = () => {
+      script.dataset.loadFailed = 'true';
+      osmdLoadPromise = null;
+      reject(new Error('The notation renderer could not be loaded'));
+    };
     document.head.appendChild(script);
+  }).catch(error => {
+    osmdLoadPromise = null;
+    throw error;
   });
   return osmdLoadPromise;
 }
@@ -61,18 +76,18 @@ function phraseFrom(incipit, mode = 'major', silentAt = []) {
 // keySignature is the written source signature. It is not the same as the
 // practical pitch a Sacred Harp class may choose when keying a song.
 const TUNES = [
-  { num: '45 t', sourceId: '45t', atlasId: 'sh 45t — New Britain', name: 'NEW BRITAIN.', meter: 'C. M.', timeSignature: '3/4', keySignature: 'C Major', attr: 'Arr. The Southern Harmony, 1835.', mode: 'major', lyric: 'Amazing grace! how sweet the sound, That saved a wretch like me!', session: 'morning session', incipit: '51313 21655 13132', smudge: [], storyAsset: 'story-01-meetinghouse.jpg', scene: 'The first page is clean. The class sounds the line once, and the room settles around it.', illustrationAlt: 'A hand-inked meetinghouse with four benches gathered around an empty square.' },
-  { num: '59', sourceId: '59', atlasId: 'sh 59 — Holy Manna', name: 'HOLY MANNA.', meter: '8s & 7s D.', timeSignature: '4/4', keySignature: 'C Major', attr: 'Arr. William Moore, 1825.', mode: 'major', lyric: 'Brethren, we have met to worship, And adore the Lord our God.', session: 'late morning', incipit: '55611 22132 11656', smudge: [], storyAsset: 'story-02-wrong-pages.jpg', scene: 'No one turns a page. Still, every book is open to a different song.', illustrationAlt: 'Several worn songbooks open to different pages on a long singing-school bench.' },
-  { num: '38 b', sourceId: '38bd', atlasId: 'sh 38b — Windham', name: 'WINDHAM.', meter: 'L. M.', timeSignature: '4/4', keySignature: 'E Minor', attr: 'Daniel Read, 1785.', mode: 'minor', lyric: 'Broad is the road that leads to death, And thousands walk together there.', session: 'dinner on the grounds', incipit: '13455 32113 23543', smudge: [3], storyAsset: 'story-03-thumbprint.jpg', scene: 'A dark thumbprint lies where the fourth note ought to be. The chairman does not look at it.', illustrationAlt: 'A dark thumbprint obscures a line of music in a worn ink illustration.' },
-  { num: '155', sourceId: '155', atlasId: 'sh 155 — Northfield', name: 'NORTHFIELD.', meter: 'C. M.', timeSignature: '4/4', keySignature: 'B♭ Major', attr: 'Jeremiah Ingalls, 1800.', mode: 'major', lyric: 'How long, dear Savior, O how long Shall this bright hour delay?', session: 'memorial lesson', incipit: '15435 13223 32121', smudge: [3], storyAsset: 'story-04-empty-chair.jpg', scene: 'The empty chair has moved closer. Its varnish is warm, as if someone has just left it.', illustrationAlt: 'An empty wooden chair pulled close to a hollow square of benches.' },
-  { num: '47 b', sourceId: '47bd', atlasId: 'sh 47b — Idumea', name: 'IDUMEA.', meter: 'S. M.', timeSignature: '3/2', keySignature: 'A Minor', attr: 'Ananias Davisson, 1816.', mode: 'minor', lyric: 'And am I born to die? To lay this body down?', session: 'for the departed', incipit: '11713 43157 54345', smudge: [3, 6], storyAsset: 'story-05-pencil-note.jpg', scene: 'The pencil note in the margin says: sing the shape you remember. The handwriting is yours.', illustrationAlt: 'A worn pencil note in a songbook margin beside a darkened music line.' },
-  { num: '163 b', sourceId: '163b', atlasId: 'sh 163b — China', name: 'CHINA.', meter: 'C. M.', timeSignature: '3/2', keySignature: 'D Major', attr: 'Timothy Swan, 1801.', mode: 'major', lyric: 'Why do we mourn departing friends, Or shake at death’s alarms?', session: 'afternoon session', incipit: '32211 36635 55667', smudge: [2, 7], storyAsset: 'story-06-floorboards.jpg', scene: 'A voice joins the class from the floorboards. It is almost, but not quite, on the note.', illustrationAlt: 'Dark floorboards beneath a singing-school bench, with a listening presence below.' },
-  { num: '159', sourceId: '159d', atlasId: 'sh 159 — Wondrous Love', name: 'WONDROUS LOVE.', meter: '12, 9, 6, 6, 12, 9.', timeSignature: '4/4', keySignature: 'F Minor', attr: 'Mead’s General Selection, 1811; arr. James Christopher, 1840.', mode: 'minor', lyric: 'What wondrous love is this, O my soul, O my soul!', session: 'afternoon session', incipit: '11724 54211 72576', smudge: [2, 6, 11], silentAt: [6], storyAsset: 'story-07-heavy-book.jpg', scene: 'The book has become heavier. Somewhere beyond the wall, the class begins the line before you.', illustrationAlt: 'A heavy closed songbook pressing into an old wooden tabletop while a distant class sings.' },
-  { num: '162', sourceId: '162', atlasId: 'sh 162 — Plenary', name: 'PLENARY.', meter: 'C. M.', timeSignature: '4/4', keySignature: 'G Major', attr: 'Arr. A. C. Clark, 1839.', mode: 'major', lyric: 'Hark! from the tombs a doleful sound, My ears attend the cry.', session: 'evening session', incipit: '51113 21231 13561', smudge: [1, 5, 9, 12], silentAt: [5], storyAsset: 'story-08-three-benches.jpg', scene: 'There are only three benches now. No one acknowledges the missing voice.', illustrationAlt: 'Three old benches surround a hollow square, with one place conspicuously missing.' },
-  { num: '268', sourceId: '268d', atlasId: 'sh 268 — Davids Lamentation', name: 'DAVID’S LAMENTATION.', meter: '', timeSignature: '2/4', keySignature: 'A Minor', attr: 'William Billings, 1778.', mode: 'minor', lyric: 'David the king was grieved and moved, He went to his chamber, and wept.', session: 'night session', incipit: '11232 32342 77112', smudge: [1, 5, 10, 14], silentAt: [5, 10], storyAsset: 'story-09-closed-leader-book.jpg', scene: 'The leader closes his book. The singing does not stop.', illustrationAlt: 'A closed songbook on the leader’s stand while unseen voices continue singing.' },
-  { num: '332', sourceId: '332d', atlasId: 'sh 332 — Sons of Sorrow', name: 'SONS OF SORROW.', meter: '8s, 7s Double', timeSignature: '2/4', keySignature: 'E Minor', attr: 'Arr. William Houser, 1848.', mode: 'minor', lyric: 'Hail ye sighing sons of sorrow; Learn with me, your certain doom.', session: 'the late gathering', incipit: '11713 43157 54345', smudge: [2, 6, 9], silentAt: [6], storyAsset: 'story-07-heavy-book.jpg', scene: 'The number is 332: Sons of Sorrow. The class sings the first line as if it has been waiting in the walls.', illustrationAlt: 'A heavy closed songbook pressing into an old wooden tabletop while a distant class sings.' },
-  { num: '209', sourceId: '209d', atlasId: 'sh 209 — Evening Shade', name: 'EVENING SHADE.', meter: 'S. M.', timeSignature: '4/4', keySignature: 'E Minor', attr: 'Stephen Jenks, 1805.', mode: 'minor', lyric: 'The day is past and gone — The night of death draws near.', session: 'night session', incipit: '13457 17154 44345', smudge: [1, 4, 9, 13], silentAt: [5, 10], storyAsset: 'story-10-wrong-shadow.jpg', scene: 'The candle is burning without a flame. Your shadow is the only one facing the square.', illustrationAlt: 'A candle without a visible flame and a lone shadow turned toward the singing square.' },
-  { num: '62', sourceId: '62', atlasId: 'sh 62 — Parting Hand', name: 'PARTING HAND.', meter: 'L. M.', timeSignature: '6/4', keySignature: 'G Major', attr: 'Arr. William Walker, 1835.', mode: 'major', lyric: 'My Christian friends, in bonds of love, Whose hearts in sweetest union prove —', session: 'closing', incipit: '13211 12123 53553', smudge: [2, 5, 9, 14], silentAt: [5, 11], storyAsset: 'story-11-place-in-square.jpg', scene: 'At the last page, the class leaves a place for you. It is not the empty chair.', illustrationAlt: 'An empty place in the center of a hollow square, waiting beneath a dim candle.' }
+  { num: '45 t', sourceId: '45t', atlasId: 'sh 45t — New Britain', name: 'NEW BRITAIN.', meter: 'C. M.', timeSignature: '3/4', keySignature: 'C Major', attr: 'Arr. The Southern Harmony, 1835.', mode: 'major', lyric: 'Amazing grace! how sweet the sound, That saved a wretch like me!', session: 'morning session', incipit: '51313 21655 13132', smudge: [], artScene: 'meetinghouse', scene: 'The first page is clean. The class sounds the line once, and the room settles around it.', illustrationAlt: 'A hand-inked meetinghouse with four benches gathered around an empty square.' },
+  { num: '59', sourceId: '59', atlasId: 'sh 59 — Holy Manna', name: 'HOLY MANNA.', meter: '8s & 7s D.', timeSignature: '4/4', keySignature: 'C Major', attr: 'Arr. William Moore, 1825.', mode: 'major', lyric: 'Brethren, we have met to worship, And adore the Lord our God.', session: 'late morning', incipit: '55611 22132 11656', smudge: [], artScene: 'wrongPages', scene: 'No one turns a page. Still, every book is open to a different song.', illustrationAlt: 'Several worn songbooks open to different pages on a long singing-school bench.' },
+  { num: '38 b', sourceId: '38bd', atlasId: 'sh 38b — Windham', name: 'WINDHAM.', meter: 'L. M.', timeSignature: '4/4', keySignature: 'E Minor', attr: 'Daniel Read, 1785.', mode: 'minor', lyric: 'Broad is the road that leads to death, And thousands walk together there.', session: 'dinner on the grounds', incipit: '13455 32113 23543', smudge: [3], artScene: 'thumbprint', scene: 'A dark thumbprint lies where the fourth note ought to be. The chairman does not look at it.', illustrationAlt: 'A dark thumbprint obscures a line of music in a worn ink illustration.' },
+  { num: '155', sourceId: '155', atlasId: 'sh 155 — Northfield', name: 'NORTHFIELD.', meter: 'C. M.', timeSignature: '4/4', keySignature: 'B♭ Major', attr: 'Jeremiah Ingalls, 1800.', mode: 'major', lyric: 'How long, dear Savior, O how long Shall this bright hour delay?', session: 'memorial lesson', incipit: '15435 13223 32121', smudge: [3], artScene: 'emptyChair', scene: 'The empty chair has moved closer. Its varnish is warm, as if someone has just left it.', illustrationAlt: 'An empty wooden chair pulled close to a hollow square of benches.' },
+  { num: '47 b', sourceId: '47bd', atlasId: 'sh 47b — Idumea', name: 'IDUMEA.', meter: 'S. M.', timeSignature: '3/2', keySignature: 'A Minor', attr: 'Ananias Davisson, 1816.', mode: 'minor', lyric: 'And am I born to die? To lay this body down?', session: 'for the departed', incipit: '11713 43157 54345', smudge: [3, 6], artScene: 'pencilNote', scene: 'The pencil note in the margin says: sing the shape you remember. The handwriting is yours.', illustrationAlt: 'A worn pencil note in a songbook margin beside a darkened music line.' },
+  { num: '163 b', sourceId: '163b', atlasId: 'sh 163b — China', name: 'CHINA.', meter: 'C. M.', timeSignature: '3/2', keySignature: 'D Major', attr: 'Timothy Swan, 1801.', mode: 'major', lyric: 'Why do we mourn departing friends, Or shake at death’s alarms?', session: 'afternoon session', incipit: '32211 36635 55667', smudge: [2, 7], artScene: 'floorboards', scene: 'A voice joins the class from the floorboards. It is almost, but not quite, on the note.', illustrationAlt: 'Dark floorboards beneath a singing-school bench, with a listening presence below.' },
+  { num: '159', sourceId: '159d', atlasId: 'sh 159 — Wondrous Love', name: 'WONDROUS LOVE.', meter: '12, 9, 6, 6, 12, 9.', timeSignature: '4/4', keySignature: 'F Minor', attr: 'Mead’s General Selection, 1811; arr. James Christopher, 1840.', mode: 'minor', lyric: 'What wondrous love is this, O my soul, O my soul!', session: 'afternoon session', incipit: '11724 54211 72576', smudge: [2, 6, 11], silentAt: [6], artScene: 'heavyBook', scene: 'The book has become heavier. Somewhere beyond the wall, the class begins the line before you.', illustrationAlt: 'A heavy closed songbook pressing into an old wooden tabletop while a distant class sings.' },
+  { num: '162', sourceId: '162', atlasId: 'sh 162 — Plenary', name: 'PLENARY.', meter: 'C. M.', timeSignature: '4/4', keySignature: 'G Major', attr: 'Arr. A. C. Clark, 1839.', mode: 'major', lyric: 'Hark! from the tombs a doleful sound, My ears attend the cry.', session: 'evening session', incipit: '51113 21231 13561', smudge: [1, 5, 9, 12], silentAt: [5], artScene: 'threeBenches', scene: 'There are only three benches now. No one acknowledges the missing voice.', illustrationAlt: 'Three old benches surround a hollow square, with one place conspicuously missing.' },
+  { num: '268', sourceId: '268d', atlasId: 'sh 268 — Davids Lamentation', name: 'DAVID’S LAMENTATION.', meter: '', timeSignature: '2/4', keySignature: 'A Minor', attr: 'William Billings, 1778.', mode: 'minor', lyric: 'David the king was grieved and moved, He went to his chamber, and wept.', session: 'night session', incipit: '11232 32342 77112', smudge: [1, 5, 10, 14], silentAt: [5, 10], artScene: 'closedBook', scene: 'The leader closes his book. The singing does not stop.', illustrationAlt: 'A closed songbook on the leader’s stand while unseen voices continue singing.' },
+  { num: '332', sourceId: '332d', atlasId: 'sh 332 — Sons of Sorrow', name: 'SONS OF SORROW.', meter: '8s, 7s Double', timeSignature: '2/4', keySignature: 'E Minor', attr: 'Arr. William Houser, 1848.', mode: 'minor', lyric: 'Hail ye sighing sons of sorrow; Learn with me, your certain doom.', session: 'the late gathering', incipit: '11713 43157 54345', smudge: [2, 6, 9], silentAt: [6], artScene: 'heavyBook', scene: 'The number is 332: Sons of Sorrow. The class sings the first line as if it has been waiting in the walls.', illustrationAlt: 'A heavy closed songbook pressing into an old wooden tabletop while a distant class sings.' },
+  { num: '209', sourceId: '209d', atlasId: 'sh 209 — Evening Shade', name: 'EVENING SHADE.', meter: 'S. M.', timeSignature: '4/4', keySignature: 'E Minor', attr: 'Stephen Jenks, 1805.', mode: 'minor', lyric: 'The day is past and gone — The night of death draws near.', session: 'night session', incipit: '13457 17154 44345', smudge: [1, 4, 9, 13], silentAt: [5, 10], artScene: 'wrongShadow', scene: 'The candle is burning without a flame. Your shadow is the only one facing the square.', illustrationAlt: 'A candle without a visible flame and a lone shadow turned toward the singing square.' },
+  { num: '62', sourceId: '62', atlasId: 'sh 62 — Parting Hand', name: 'PARTING HAND.', meter: 'L. M.', timeSignature: '6/4', keySignature: 'G Major', attr: 'Arr. William Walker, 1835.', mode: 'major', lyric: 'My Christian friends, in bonds of love, Whose hearts in sweetest union prove —', session: 'closing', incipit: '13211 12123 53553', smudge: [2, 5, 9, 14], silentAt: [5, 11], artScene: 'placeInSquare', scene: 'At the last page, the class leaves a place for you. It is not the empty chair.', illustrationAlt: 'An empty place in the center of a hollow square, waiting beneath a dim candle.' }
 ].map(tune => {
   const harmony = HARMONY_DATA[tune.sourceId] || null;
   const tenor = harmony?.parts.find(part => part.name === 'tenor');
@@ -100,7 +115,8 @@ const TUNES = [
 const state = {
   mode: 'campaign', screen: 'title', songIndex: 0, cursor: 0, phase: 'idle',
   mistakes: 0, totalMistakes: 0, wrongHere: 0, lost: [], playToken: 0, notationToken: 0,
-  settings: loadSettings(), hideAt: 0, referenceUnlocked: false, harmonyUnlocked: false, harmonyPreviewToken: 0, audio: null
+  settings: loadSettings(), hideAt: 0, referenceUnlocked: false, harmonyUnlocked: false,
+  harmonyPreviewToken: 0, harmonyPlateToken: 0, audio: null, activePhrase: null, pendingRunTimers: new Set(), scheduledAudio: new Set()
 };
 
 function loadSettings() {
@@ -143,8 +159,35 @@ function sourceTenorNotes(tune) {
   return notes.length ? notes : tune.notes;
 }
 function notesFor(tune) {
+  if (state.screen === 'game' && state.activePhrase) return state.activePhrase;
   const notes = sourceTenorNotes(tune);
   return state.settings.reducedMemory && state.mode === 'campaign' ? notes.slice(0, 10) : notes;
+}
+function selectedPhrase(tune) {
+  const notes = sourceTenorNotes(tune);
+  return state.settings.reducedMemory && state.mode === 'campaign' ? notes.slice(0, 10) : notes;
+}
+function scheduleRunWork(callback, delay) {
+  const token = state.playToken;
+  const timer = window.setTimeout(() => {
+    state.pendingRunTimers.delete(timer);
+    if (token === state.playToken) callback();
+  }, delay);
+  state.pendingRunTimers.add(timer);
+  return timer;
+}
+function cancelRunWork() {
+  state.playToken++;
+  state.harmonyPreviewToken++;
+  state.pendingRunTimers.forEach(timer => window.clearTimeout(timer));
+  state.pendingRunTimers.clear();
+  state.scheduledAudio.forEach(node => {
+    try { node.stop(); } catch (_) { /* already stopped */ }
+  });
+  state.scheduledAudio.clear();
+  state.activePhrase = null;
+  const previewButton = $('#harmony-play-button');
+  if (previewButton) previewButton.disabled = false;
 }
 function noteSyllable(note) { return note.syllable || syllableOf(note.degree); }
 function harmonyParts(tune) { return tune.harmony?.parts || []; }
@@ -173,6 +216,7 @@ function storyFor(index) {
 }
 
 function showStory(index) {
+  cancelRunWork();
   state.songIndex = index;
   if (index > 0 || state.mode === 'practice') {
     state.referenceUnlocked = true;
@@ -182,8 +226,8 @@ function showStory(index) {
   $('#story-kicker').textContent = `providence chapel · ${tune.session}`;
   $('#story-heading').textContent = index === 0 ? 'The class is waiting.' : `Page ${tune.num.replace(/\s/g, '')}.`;
   const illustration = $('#story-illustration');
-  illustration.src = `assets/${tune.storyAsset}`;
-  illustration.alt = tune.illustrationAlt;
+  illustration.setAttribute('aria-label', tune.illustrationAlt);
+  illustration.innerHTML = window.HollowArt.story(tune.artScene, tune.illustrationAlt);
   $('#story-reference-button').hidden = index === 0;
   $('#story-text').innerHTML = storyFor(index);
   showScreen('story');
@@ -299,18 +343,6 @@ function renderBenches() {
   if (benchState) benchState.setAttribute('aria-label', `Voices remaining. ${risk.textContent}`);
 }
 
-const CLEF_PATHS = {
-  treble: 'M 27 99 C 12 98 8 84 15 75 C 21 67 32 68 34 76 C 36 84 29 89 23 85 C 16 80 22 64 32 51 C 43 37 46 23 40 12 C 35 3 25 7 23 18 C 21 29 30 37 39 43 C 50 50 53 65 50 80 C 47 96 37 104 25 100 C 14 96 9 83 14 74 M 29 37 L 29 89',
-  bass: 'M 11 38 C 22 31 37 32 42 40 C 46 47 40 54 31 54 C 20 54 13 48 11 38'
-};
-
-function engravedClef(kind, x, y, scale = 1) {
-  if (kind === 'bass') {
-    return `<g class="svg-clef-path bass-clef" transform="translate(${x} ${y}) scale(${scale})"><path d="${CLEF_PATHS.bass}"/><circle cx="18" cy="51" r="2.4"/><circle cx="39" cy="51" r="2.4"/></g>`;
-  }
-  return `<g class="svg-clef-path" transform="translate(${x} ${y}) scale(${scale})"><path d="${CLEF_PATHS.treble}"/></g>`;
-}
-
 function harmonyMeasureBeats(tune) {
   const [numerator, denominator] = (tune.timeSignature || '4/4').split('/').map(Number);
   return numerator && denominator ? numerator * (4 / denominator) : 4;
@@ -319,38 +351,24 @@ function harmonyMeasureBeats(tune) {
 function renderHarmonyPlate(tune) {
   const parts = harmonyParts(tune);
   if (!parts.length) return '<p class="quiet-note">The source opening is not available in four-part form.</p>';
-  const width = 1000;
-  const left = 154;
-  const right = 978;
-  const rowHeight = 86;
-  const top = 18;
-  const staffTop = 27;
-  const staffBottom = 59;
-  const beatWidth = (right - left) / tune.harmony.beats;
-  const measure = harmonyMeasureBeats(tune);
-  const bars = [];
-  for (let beat = measure; beat < tune.harmony.beats - .01; beat += measure) {
-    const x = left + beat * beatWidth;
-    bars.push(`<line class="mini-bar" x1="${x}" y1="${staffTop}" x2="${x}" y2="${staffBottom}"/>`);
+  return `<div class="harmony-engraving-mount" data-tune="${tune.sourceId}" role="img" aria-label="Source notation for the opening four measures of ${tune.name}"><p class="quiet-note">Loading the source notation…</p></div>`;
+}
+
+async function renderSourceHarmonyPlate(tune, container) {
+  const renderToken = ++state.harmonyPlateToken;
+  container.innerHTML = renderHarmonyPlate(tune);
+  const mount = container.querySelector('.harmony-engraving-mount');
+  if (!mount) return;
+  try {
+    if (!await loadOsmd()) throw new Error('The notation renderer is unavailable');
+    const osmd = new window.opensheetmusicdisplay.OpenSheetMusicDisplay(mount);
+    osmd.setOptions({ backend: 'svg', drawTitle: false, drawComposer: false, drawPartNames: true, drawMeasureNumbers: false, drawLyrics: false, drawingParameters: 'compacttight', pageFormat: 'Endless' });
+    await osmd.load(musicXmlForTune([], tune, 4));
+    if (renderToken !== state.harmonyPlateToken || mount !== container.querySelector('.harmony-engraving-mount')) return;
+    osmd.render();
+  } catch (_) {
+    if (renderToken === state.harmonyPlateToken) mount.innerHTML = '<p class="quiet-note">The source notation could not be loaded. Close and reopen the parts to try again.</p>';
   }
-  const rows = parts.map((part, rowIndex) => {
-    const rowTop = top + rowIndex * rowHeight;
-    const pitches = part.events.filter(event => event[2] !== null).map(event => staffStepFromMidi(event[2]));
-    const center = pitches.reduce((sum, step) => sum + step, 0) / Math.max(1, pitches.length);
-    const lines = [0, 1, 2, 3, 4].map(line => `<line class="mini-lines" x1="${left}" y1="${rowTop + staffTop + line * 8}" x2="${right}" y2="${rowTop + staffTop + line * 8}"/>`).join('');
-    const marks = part.events.filter(event => event[2] !== null).map(event => {
-      const x = left + event[0] * beatWidth;
-      const y = rowTop + 43 - (staffStepFromMidi(event[2]) - center) * 4.2;
-      const stemUp = y > rowTop + 43;
-      const stemX = stemUp ? x + 6 : x - 6;
-      const stemY = stemUp ? y - 22 : y + 22;
-      return `<g class="mini-note-group"><line class="mini-stem" x1="${stemX}" y1="${y}" x2="${stemX}" y2="${stemY}"/><ellipse class="mini-note" cx="${x}" cy="${y}" rx="6.5" ry="4.5" transform="rotate(-16 ${x} ${y})"/></g>`;
-    }).join('');
-    const clef = engravedClef(part.name === 'bass' ? 'bass' : 'treble', part.name === 'bass' ? 104 : 102, rowTop + (part.name === 'bass' ? 22 : 5), part.name === 'bass' ? .54 : .43);
-    return `<g class="harmony-row"><text class="mini-label" x="8" y="${rowTop + 48}">${part.name}</text>${clef}${lines}${bars.map(bar => bar.replace(/y1="(\d+(?:\.\d+)?)" y2="(\d+(?:\.\d+)?)"/g, (_, y1, y2) => `y1="${Number(y1) + rowTop}" y2="${Number(y2) + rowTop}"`)).join('')}${marks}</g>`;
-  }).join('');
-  const height = top + parts.length * rowHeight;
-  return `<svg class="harmony-engraving" viewBox="0 0 ${width} ${height}" role="img" aria-label="The first four measures in ${parts.map(part => part.name).join(', ')} parts"><text class="mini-time" x="126" y="${top + 15}">${tune.timeSignature || ''}</text>${rows}</svg>`;
 }
 
 const XML_PITCHES = [
@@ -422,8 +440,8 @@ function musicXmlSegmentsForMeasure(part, measureIndex, measureBeats, totalBeats
       duration: overlapEnd - overlapStart,
       midi,
       shape,
-      tieStart: midi !== null && beat < start - .001,
-      tieStop: midi !== null && eventEnd > end + .001
+      tieStart: midi !== null && eventEnd > end + .001,
+      tieStop: midi !== null && beat < start - .001
     });
     cursor = overlapEnd;
   });
@@ -441,11 +459,12 @@ function musicXmlPart(part, partIndex, tune, measureCount, measureBeats, totalBe
   return `<part id="P${partIndex + 1}">${measures.join('')}</part>`;
 }
 
-function musicXmlForTune(notes, tune) {
+function musicXmlForTune(notes, tune, requestedMeasures = Infinity) {
   const measureBeats = harmonyMeasureBeats(tune);
   const parts = harmonyParts(tune);
   const sourceParts = parts.length ? parts : [{ name: 'tenor', events: notes.map(note => [note.beat || 0, note.duration || 1, note.midi ?? null, noteSyllable(note)]) }];
-  const totalBeats = Math.max(1, tune.harmony?.beats || sourceParts.reduce((end, part) => Math.max(end, ...part.events.map(event => event[0] + event[1])), 0));
+  const sourceBeats = Math.max(1, tune.harmony?.beats || sourceParts.reduce((end, part) => Math.max(end, ...part.events.map(event => event[0] + event[1])), 0));
+  const totalBeats = Math.min(sourceBeats, measureBeats * requestedMeasures);
   const measureCount = Math.max(1, Math.ceil(totalBeats / measureBeats));
   const partList = sourceParts.map((part, index) => `<score-part id="P${index + 1}"><part-name>${part.name[0].toUpperCase()}${part.name.slice(1)}</part-name></score-part>`).join('');
   const partXml = sourceParts.map((part, index) => musicXmlPart(part, index, tune, measureCount, measureBeats, totalBeats)).join('');
@@ -559,7 +578,10 @@ function updateHarmonyControls() {
   playButton.textContent = names.length ? `hear ${names.join(' · ')}` : 'hear the class';
   const remaining = activeHarmonyParts(tune).length;
   status.textContent = names.length ? `${remaining} of ${names.length} parts sounding` : 'the class is unaccompanied';
-  if (!$('#harmony-plate').hidden) $('#harmony-plate').innerHTML = renderHarmonyPlate(tune);
+  if (!$('#harmony-plate').hidden && $('#harmony-plate').dataset.tune !== tune.sourceId) {
+    $('#harmony-plate').dataset.tune = tune.sourceId;
+    renderSourceHarmonyPlate(tune, $('#harmony-plate'));
+  }
 }
 
 function renderStaff() {
@@ -600,7 +622,7 @@ function renderStaff() {
   const silenceHint = $('#silence-hint');
   if (silenceHint) silenceHint.hidden = !hasSilentNotes;
   const gameFooter = $('.game-footer');
-  if (gameFooter) gameFooter.hidden = !hasSilentNotes;
+  if (gameFooter) gameFooter.hidden = false;
   renderBenches();
   updateHarmonyControls();
 }
@@ -652,6 +674,8 @@ function organTone(frequency, duration, offset = 0, gain = .035) {
     oscillator.frequency.value = frequency * ratio;
     partialGain.gain.value = level;
     oscillator.connect(partialGain).connect(master);
+    state.scheduledAudio.add(oscillator);
+    oscillator.addEventListener('ended', () => state.scheduledAudio.delete(oscillator), { once: true });
     oscillator.start(now);
     oscillator.stop(now + duration + .06);
   });
@@ -703,8 +727,8 @@ function playHarmonyPreview() {
   const step = state.settings.reducedMemory ? 280 : 360;
   scheduleHarmony(tune, step, .05);
   setPrompt(`<em>${activeHarmonyParts(tune).map(part => part.name).join(', ')} enter together.</em>`);
-  window.setTimeout(() => {
-    if (state.harmonyPreviewToken === previewToken && state.phase !== 'done') {
+  scheduleRunWork(() => {
+    if (state.harmonyPreviewToken === previewToken) {
       if (playButton) playButton.disabled = false;
       renderStaff();
     }
@@ -722,7 +746,7 @@ function playPhrase() {
   const harmonyDuration = tune.harmony ? tune.harmony.beats * step : notes.length * step;
   if (tune.harmony) scheduleHarmony(tune, step);
   notes.forEach((note, index) => {
-    window.setTimeout(() => {
+    scheduleRunWork(() => {
       if (token !== state.playToken) return;
       state.cursor = index;
       renderStaff();
@@ -731,7 +755,7 @@ function playPhrase() {
       else setPrompt(`<span>${noteSyllable(note)}</span>`);
     }, 360 + (tune.harmony ? (note.beat ?? index) * step : index * step));
   });
-  window.setTimeout(() => {
+  scheduleRunWork(() => {
     if (token !== state.playToken) return;
     state.phase = 'sing'; state.cursor = firstSungIndex(notes); state.wrongHere = 0;
     const visibilityWindow = state.settings.visibility === 'longer' ? 5000 : 900;
@@ -740,16 +764,19 @@ function playPhrase() {
     setPrompt(state.mode === 'practice' ? 'Your turn. Name each shape; a correction is just another repetition.' : 'Your turn. The ink will not wait.');
     renderStaff();
     if (state.mode === 'campaign' && state.settings.visibility !== 'always') {
-      window.setTimeout(() => { if (token === state.playToken && state.phase === 'sing') renderStaff(); }, visibilityWindow + 40);
+      scheduleRunWork(() => { if (token === state.playToken && state.phase === 'sing') renderStaff(); }, visibilityWindow + 40);
     }
   }, tune.harmony ? 450 + harmonyDuration : 450 + notes.length * step);
 }
 
 function beginLesson() {
+  cancelRunWork();
   initAudio();
-  state.cursor = 0; state.phase = 'listen'; state.mistakes = 0; state.wrongHere = 0; state.playToken++;
+  state.activePhrase = selectedPhrase(currentTune());
+  state.cursor = 0; state.phase = 'listen'; state.mistakes = 0; state.wrongHere = 0;
+  setKeysEnabled(false);
   [...currentTune().notes, ...(currentTune().realNotes || [])].forEach(note => { delete note.revealed; });
-  showScreen('game'); renderStaff(); window.setTimeout(playPhrase, 350);
+  showScreen('game'); renderStaff(); scheduleRunWork(playPhrase, 350);
 }
 
 function loseBench() {
@@ -760,7 +787,7 @@ function loseBench() {
   state.harmonyUnlocked = true;
   playBenchLossSound();
   $('#game').classList.add('bench-loss');
-  window.setTimeout(() => $('#game').classList.remove('bench-loss'), 750);
+  scheduleRunWork(() => $('#game').classList.remove('bench-loss'), 750);
   setPrompt(`<em>The ${next} bench goes quiet. The class keeps time.</em>`, true);
   if (voices.length && state.lost.length >= voices.length) finishGame(false);
 }
@@ -775,7 +802,7 @@ function finishTune() {
   }
   if (state.songIndex === TUNES.length - 1) { finishGame(true); return; }
   setPrompt('<em>The class holds the chord, then turns the page.</em>');
-  window.setTimeout(() => showStory(state.songIndex + 1), 1800);
+  scheduleRunWork(() => showStory(state.songIndex + 1), 1800);
 }
 
 function finishGame(won) {
@@ -788,7 +815,7 @@ function finishGame(won) {
   showScreen('end');
 }
 
-function resetCampaign() { state.mode = 'campaign'; state.songIndex = 0; state.lost = []; state.mistakes = 0; state.totalMistakes = 0; state.referenceUnlocked = false; state.harmonyUnlocked = false; showStory(0); }
+function resetCampaign() { cancelRunWork(); state.mode = 'campaign'; state.songIndex = 0; state.cursor = 0; state.phase = 'idle'; state.lost = []; state.mistakes = 0; state.totalMistakes = 0; state.wrongHere = 0; state.referenceUnlocked = false; state.harmonyUnlocked = false; showStory(0); }
 
 function handleSing(input) {
   if (state.phase !== 'sing') return;
@@ -831,9 +858,9 @@ document.addEventListener('click', event => {
   const actionTarget = event.target.closest('[data-action]');
   if (actionTarget) {
     const action = actionTarget.dataset.action;
-    if (action === 'home') { state.playToken++; state.mode = 'campaign'; showScreen('title'); }
-    if (action === 'open-book') { initAudio(); state.referenceUnlocked = false; state.harmonyUnlocked = false; showStory(0); }
-    if (action === 'open-school') { state.playToken++; populatePractice(); showScreen('practice'); }
+    if (action === 'home') { cancelRunWork(); state.mode = 'campaign'; state.phase = 'idle'; showScreen('title'); }
+    if (action === 'open-book') { initAudio(); resetCampaign(); }
+    if (action === 'open-school') { cancelRunWork(); state.mode = 'practice'; populatePractice(); showScreen('practice'); }
     if (action === 'begin-lesson') beginLesson();
     if (action === 'open-settings') openDrawer('#settings-drawer');
     if (action === 'close-drawer') closeDrawer('#settings-drawer');
@@ -843,7 +870,12 @@ document.addEventListener('click', event => {
     if (action === 'toggle-harmony') {
       const plate = $('#harmony-plate');
       plate.hidden = !plate.hidden;
-      if (!plate.hidden) plate.innerHTML = `${renderHarmonyPlate(currentTune())}<p class="harmony-scroll-note">on a small screen, swipe across the plate</p>`;
+      if (!plate.hidden) {
+        plate.dataset.tune = currentTune().sourceId;
+        renderSourceHarmonyPlate(currentTune(), plate);
+      } else {
+        state.harmonyPlateToken++;
+      }
       event.target.textContent = plate.hidden ? 'show the parts' : 'hide the parts';
     }
     if (action === 'replay') { if (state.phase === 'sing' || state.phase === 'done') { state.playToken++; playPhrase(); } }
@@ -876,6 +908,7 @@ document.addEventListener('keydown', event => {
         first.focus();
       }
     }
+    return;
   }
   if (event.repeat) return;
   if (state.screen !== 'game') return;
@@ -887,4 +920,5 @@ document.addEventListener('keydown', event => {
 $('#settings-form').addEventListener('change', saveSettings);
 $('#replay-button').addEventListener('click', () => { if (state.phase === 'sing' || state.phase === 'done') { state.playToken++; playPhrase(); } });
 
+$('#title-art').innerHTML = window.HollowArt.title();
 buildShapeKeys(); populatePractice(); updateSettingsForm(); showScreen('title');

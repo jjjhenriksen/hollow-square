@@ -443,6 +443,26 @@ h1 em { color: inherit; font-style: normal; }
 
 /* Keep the HTML hidden state authoritative for controls as well as screens. */
 [hidden] { display: none !important; }
+:focus-visible { outline-color: #783a32; }
+
+/* Programmatic story art shares the ink-and-paper palette and scales without
+   loading bitmap assets. */
+.programmatic-art { display: block; width: 100%; height: auto; color: #38291b; }
+.title-plate .programmatic-art { max-height: 330px; }
+.story-illustration .programmatic-art { width: 100%; }
+.harmony-engraving-mount { min-width: 720px; }
+.harmony-engraving-mount svg { display: block; max-width: none; }
+
+@media (max-width: 375px) {
+  .game-controls, .shape-keys, .utility-controls { min-width: 0; }
+  .shape-keys { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .shape-key { min-width: 0; min-height: 64px; padding: 3px 1px; }
+  .shape-key .key-shortcut { font-size: 8px; }
+  .utility-controls { grid-template-columns: minmax(0, 1fr) max-content; gap: 8px; }
+  .utility-controls .text-button { max-width: 100%; white-space: normal; text-align: right; }
+  .game-footer { flex-wrap: wrap; justify-content: flex-start; gap: 8px 14px; font-size: 9px; letter-spacing: .06em; }
+  .game-footer span:last-child { text-align: left; }
+}
 
 /* The primary line is an SVG engraving so stems, clefs, meters, bars, and
    ledger lines stay in one coordinate system at every viewport width. */
