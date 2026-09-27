@@ -83,6 +83,23 @@ test('320px practice controls fit without page-level horizontal overflow', async
   expect(wider.document).toBeLessThanOrEqual(wider.viewport);
 });
 
+test('280px practice controls fit while notation scrolls inside its panel', async ({ page }) => {
+  await page.setViewportSize({ width: 280, height: 812 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Attend Singing School' }).click();
+  await page.getByRole('button', { name: /WINDHAM/ }).click();
+  await expect(page.locator('#shape-keys button').first()).toBeVisible();
+  const widths = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
+  expect(widths.document).toBeLessThanOrEqual(widths.viewport);
+  const harmonyRight = await page.locator('#harmony-play-button').evaluate(node => node.getBoundingClientRect().right);
+  expect(harmonyRight).toBeLessThanOrEqual(280);
+  const notation = await page.locator('#staff').evaluate(node => {
+    const panel = node.closest('.staff-wrap');
+    return { scrollWidth: panel.scrollWidth, clientWidth: panel.clientWidth };
+  });
+  expect(notation.scrollWidth).toBeGreaterThan(notation.clientWidth);
+});
+
 test('a failed notation download can retry on a later phrase', async ({ page }) => {
   let fail = true;
   await page.route('**/vendor/opensheetmusicdisplay.min.js', route => fail ? route.abort() : route.continue());
