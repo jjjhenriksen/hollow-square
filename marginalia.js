@@ -5,7 +5,7 @@
   // The lookup never includes caller-provided content in the returned markup.
   const notes = Object.freeze({
     meetinghouse: 'Sing the shapes before the words.',
-    pencilNote: 'Keep the first line in mind.',
+    pencilNote: 'Sing the shape you remember.',
     emptyChair: 'Was that chair always so close?',
     threeBenches: 'Count the benches again.',
     placeInSquare: 'Leave a little room.'

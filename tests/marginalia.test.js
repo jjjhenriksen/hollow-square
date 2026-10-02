@@ -26,7 +26,7 @@ test('story navigation replaces margin writing and clears pages without notes', 
   const slot = page.locator('#story-margin-note');
   await expect(slot.getByRole('complementary', { name: 'Handwritten margin note' })).toBeVisible();
   await expect(slot).toContainText('Sing the shapes before the words.');
-  for (const [index, text] of [[3, 'Was that chair always so close?'], [4, 'Keep the first line in mind.'], [7, 'Count the benches again.'], [11, 'Leave a little room.']]) {
+  for (const [index, text] of [[3, 'Was that chair always so close?'], [4, 'Sing the shape you remember.'], [7, 'Count the benches again.'], [11, 'Leave a little room.']]) {
     await page.evaluate(index => showStory(index), index);
     await expect(slot.locator('.margin-note')).toHaveCount(1);
     await expect(slot.locator('p')).toHaveText(text);
