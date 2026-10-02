@@ -50,100 +50,215 @@
   }
 
   function room(dark = false) {
-    const washes = fill('M95 139 358 42 629 138 600 310 518 268 205 265 112 319Z', 'pine', dark ? .32 : .16) +
-      fill('M110 157 231 110 227 266 112 319Z', 'indigo', .20) +
-      fill('M491 109 618 156 600 310 502 267Z', 'pine', .24) + bloom(590, 250, 19, 68, 'pine', .18, 'wall-pool') +
-      bloom(355, 173, 99, 83, 'ochre', .10, 'room-light') +
-      fill('M230 266 498 265 652 414 64 414Z', 'wood', .1) +
-      bloom(167, 276, 85, 123, 'pine', .13, 'left-damp') +
-      bloom(565, 276, 79, 118, 'indigo', dark ? .28 : .12, 'right-damp');
-    let lines = pen('M101 311 106 142 357 47 620 144 603 312', 1.7, .55, 'pine') +
-      pen('M122 156 358 67 603 155M142 183 358 94 579 181M168 208 358 126 552 208', 1.5, .58) +
-      pen('M125 160 357 72 598 160M148 187 356 100 572 185', .55, .46, 'wood') +
-      pen('M231 117 230 266 498 267 494 118M111 315 230 266M499 267 600 313', 1, .48) +
-      pen('M106 142 120 156 117 306M621 145 605 158 593 304', .7, .6);
-    // Floorboards converge on the far wall; broken marks suggest worn timber.
-    for (let i = 0; i < 9; i++) {
-      lines += pen(`M${238 + i * 31} 269 ${65 + i * 73} 414`, .7, .28, 'wood');
+    // Fragments of the interior dissolve into the real page; no enclosing roof.
+    const washes = fill('M119 94Q147 86 177 102L173 254 93 340 86 262 105 149Z', 'pine', dark ? .2 : .12) +
+      fill('M482 102Q553 97 603 121L638 305 612 354 550 261 549 107Z', 'indigo', dark ? .22 : .12) +
+      fill('M187 104Q356 85 550 108L553 175Q475 152 380 171L198 161Z', 'ochre', .11) +
+      fill('M541 181Q566 198 584 213L608 320 586 298 540 260Z', 'pine', .16) +
+      bloom(140, 268, 36, 61, 'pine', .14, 'wainscot-pool') +
+      bloom(530, 244, 29, 46, 'indigo', .14, 'stove-pool') +
+      fill('M152 275Q337 249 564 276L630 400Q490 385 442 417L217 421 97 392Z', 'wood', .055);
+    let lines = pen('M112 95q22-4 63 7M187 103q127-14 208-8m27 2 127 11M550 108l23 68m8 23 16 66m7 23 15 52', .9, .55, 'wood') +
+      pen('M179 104l-3 151M549 109l1 143M174 253l-76 87m455-83 67 85M184 247l44-1m17 0 67 0m87 0 49 2m19 1 45 2', .85, .5) +
+      pen('M111 123l56-10M106 151l65-19M102 179l69-23M96 207l73-27M91 238l73-33M88 269l75-35M90 300l63-34', .55, .37, 'wood') +
+      pen('M185 168l57 1m11 0 69-1m28-1 48 1m12 0 97 4M185 188l92 2m24-1 39 1m21 1 78 2m12 0 91 3M181 218l74 1m12 0 61 1m24 0 77 2m10 0 72 3', .55, .4, 'wood') +
+      pen('M204 172l1 13m81-13 1 15m107-13 1 14m89-9 1 16M231 195l1 22m114-21 1 23m111-16 2 21', .5, .35, 'wood');
+    // Overhead beams taper away; omit portions to retain the loose sketch edge.
+    lines += pen('M105 66 221 98m4 1 69-5M124 60 238 92m133-45 10 48m8-47 2 46M541 94l62-26m-56 18 39-18', 1.3, .48) +
+      pen('M108 72l25-3m7 10 24-1m10 8 24-1M377 62l6 14m167 8 17-5', .5, .4, 'wood');
+    for (let i = 0; i < 10; i++) {
+      const x = -325 + i * 71;
+      const a = project(x, 0, 560), b = project(x, 0, 70);
+      const t = .24 + (i % 3) * .16;
+      const c = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+      lines += pen(`M${a.join(' ')}Q${c[0] + 1.4} ${c[1] - 1} ${b.join(' ')}`, .55, .24, 'wood');
     }
-    lines += pen('M93 355Q351 348 625 356M69 398Q357 386 646 398M164 349l29-3m-51 14 21-3m327 14 42 3m-63 5 23 3M250 310l12-6m219 17 18 3', .7, .3);
-    lines += pen('M122 213l54-19m-52 27 61-21m-55 33 41-14M522 205l61 20m-57-9 54 17m-49-6 46 15M234 242l32-1m10 0 32 1m96-1 28 1m12 0 43 1M190 180l11 5m-4-15 10 6M521 172l-8 5m14 0-8 5', .48, .36);
-    const window = fill('M334 161Q357 133 381 161L381 230 333 230Z', 'light', .75) +
-      fill('M339 166Q357 141 376 166L376 224 339 224Z', 'indigo', .12) +
-      pen('M333 231 334 161Q357 133 381 161L381 231M330 234h56M358 146v82M335 183h44M336 207h43', 1, .65) +
-      pen('M337 226v-60q20-24 40 0', .55, .5, 'wood');
-    return layers(washes, lines) + window;
+    lines += pen('M93 390l42-4m12-1 64-5m17-1 31-2m202-4 47 4m15 1 42 4M235 329l29-3m178 9 36 3', .6, .35, 'wood');
+    return layers(washes, lines) + windowPlate(238, 113, 57, 92, false) +
+      windowPlate(446, 116, 60, 94, true) + stove(540, 239, .62);
   }
 
-  function bench(x, y, scale = 1, angle = 0) {
-    const seat = 'M-102 1 72-8 103 4-73 17Z';
-    const back = 'M-100-39 71-48 74-21-98-11Z';
-    return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${scale})">` + layers(
-      fill(back, 'pine', .25) + fill(seat, 'ochre', .36) + fill('M-73 17 103 4 100 15-72 28Z', 'wood', .42) +
-      fill('M-88-5-83 57-75 59-76-7M75-13 83 49 90 48 86-15Z', 'wood', .36) + bloom(-27, -24, 41, 8, 'pine', .13, 'bench-grain'),
-      pen(`${back}M-99-35 71-44M-90-32l145-8M-92-19l91-5M-84-13v21M62-22v15`, 1.2, .84) +
-      pen(`${seat}M-73 17v11L100 15l3-11M-84 24l1 32 9 3-1-33M76 19l6 31 9-2-5-31`, 1.85, .94) +
-      pen('M-61 7 66 0M-45 12l90-5M-83-29l28-2m18-1 44-2M-76 31l2 20M88 22l2 16', .55, .66, 'wood') +
-      pen('M-99-37l-1 20m5-2 1-9m3 8 1-10m3 9 1-7M64-42l1 17m4-13 1 11', .6, .58)
+  function windowPlate(x, y, width, height, mirrored) {
+    const outer = `M${x} ${y}l${width} 2 1 ${height}-${width + 3} 2Z`;
+    let trees = '';
+    for (let i = 0; i < 4; i++) {
+      const px = x + 10 + i * 11, py = y + 32 + (i % 3) * 9;
+      trees += fill(`M${px} ${py}l-5 18h3l-6 12h16l-6-12h3Z`, 'pine', .2) + pen(`M${px} ${py + 7}v37`, .45, .32, 'pine');
+    }
+    return fill(outer, 'light', .18) + layers(
+      fill(`M${x + 5} ${y + 7}l${width - 10} 2 1 ${height - 16}-${width - 11} 1Z`, 'light', .38) +
+      fill(`M${x + 5} ${y + height - 34}q20-13 ${width - 8}-5v31l-${width - 8} 1Z`, 'pine', .12) + trees,
+      pen(outer, 1.15, .74) + pen(`M${x + 5} ${y + 6}v${height - 7}m${width - 9}-${height - 7} 1 ${height - 8}M${x + width / 2} ${y + 3}v${height - 4}M${x + 2} ${y + height * .49}l${width - 3} 1M${x - 4} ${y + height + 4}l${width + 12}-1`, .8, .63) +
+      pen(`M${x + 7} ${y + height + 8}l${width - 3}-1m-${width - 10}-4 2-12M${x + (mirrored ? width - 4 : 2)} ${y + 10}l1 42`, .55, .5, 'wood')
+    );
+  }
+
+  function stove(x, y, scale) {
+    return `<g transform="translate(${x} ${y}) scale(${scale})">` + layers(
+      fill('M-18-59Q0-67 19-59L22-8Q0 2-23-8Z', 'indigo', .37) +
+      fill('M-8-63-7-195 8-195 9-63Z', 'ink', .19),
+      pen('M-7-194 7-194 8-69M-7-191-8-68M-20-64q20-9 41 0l2 7q-23 9-46 0ZM-21-56l-2 48q24 8 46 0l-2-48M-15-7l-5 16m36-17 5 16M-13-42q13-7 27 0v22q-14 7-27 0ZM-9-36l17-1m-4 10h5M-21-17q24 9 44-1', 1.05, .68) +
+      pen('M-17-54l1 7m1 6 1 20m-5 1 1 8M-2-187l1 63m0 11 1 22M-10-18l8 3m5-2 8-3', .5, .48, 'ink')
     ) + '</g>';
   }
 
-  // Side benches recede in perspective; rotating a front view would tilt the legs.
-  function sideBench(right = false) {
-    const back = 'M230 219 150 286 146 330 227 264Z';
-    const seat = 'M226 270 145 337 180 351 262 282Z';
-    return `<g${right ? ' transform="translate(720 0) scale(-1 1)"' : ''}>` + layers(
-      fill(back, 'pine', .39) + fill(seat, 'ochre', .43) +
-      fill('M145 337 180 351 262 282 263 295 183 365 144 349Z', 'wood', .42),
-      pen(back, 1.7, .88) + pen(seat, 1.95, .92) +
-      pen('M146 330 144 349 183 365 263 295 262 282M153 350 151 397 163 399 166 358M246 307l1 43 10 1-2-51M181 365v40m-9-38-2 32', 1.7) +
-      pen('M225 227 156 284M223 243 151 301M218 259 152 315M154 341l73-63m-62 69 82-68M157 365l-1 25M251 315v25', .65, .68, 'wood') +
-      pen('M226 232l-2 19m-4-14-1 15M154 296v19m4-22v17m4-25v19', .7, .57)
-    ) + '</g>';
+  // A single perspective model keeps the four benches facing their shared center.
+  function project(x, y, z) {
+    const scale = 1 / (1 + z / 900);
+    return [+(360 + x * scale).toFixed(2), +(427 - (y * .66 + z * .57) * scale).toFixed(2)];
   }
 
-  // The near bench is seen from behind: its back faces the reader, while its
-  // seat extends toward the open square. A front-view bench faces outward here.
-  function nearBench() {
-    const back = 'M-104-38 102-47 105-15-103-5Z';
-    return '<g transform="translate(359 376) scale(1.08)">' + layers(
-      fill('M-106-12 89-24 109-15-87-1Z', 'ochre', .35) +
-      fill('M-93-7-90 34-80 36-81-8M83-16 91 29 100 27 95-17Z', 'wood', .43) +
-      fill(back, 'pine', .39) + bloom(-25, -26, 62, 9, 'pine', .13, 'near-bench-grain'),
-      pen('M-106-12 89-24 109-15-87-1Z M-93-7l3 41 10 2-1-44M83-16l8 45 9-2-5-44', 1.85, .94) +
-      pen(back, 1.75, .94) +
-      pen('M-99-33 97-42M-99-12 99-22M-98-27l65-3m8-1 48-2m11-1 54-3M-91-33l1 16m4-15 1 13m4-12 1 9M90-41l1 14m4-14 1 10M-88 7l2 21M95-1l3 21', .65, .66, 'wood')
-    ) + '</g>';
+  function handPolygon(points, key) {
+    const random = randomFor(key);
+    const pts = points.map(([x, y]) => [x + (random() - .5) * 1.0, y + (random() - .5) * 1.0]);
+    let d = `M${pts[0].join(' ')}`;
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i], b = pts[(i + 1) % pts.length];
+      d += `Q${(a[0] + b[0]) / 2 + (random() - .5) * 2.4} ${(a[1] + b[1]) / 2 + (random() - .5) * 1.9} ${b.join(' ')}`;
+    }
+    return d + 'Z';
+  }
+
+  function timber(x0, x1, y0, y1, z0, z1, color, key) {
+    const side = (x0 + x1) / 2 < 0 ? x1 : x0;
+    const faces = [
+      [[side, y0, z0], [side, y0, z1], [side, y1, z1], [side, y1, z0]],
+      [[x0, y1, z1], [x1, y1, z1], [x1, y1, z0], [x0, y1, z0]],
+      [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0]]
+    ];
+    const paths = faces.map((face, i) => handPolygon(face.map(v => project(...v)), `${key}-${i}`));
+    const strength = .56 + (1 - z0 / 700) * .32;
+    let grain = '';
+    if (x1 - x0 > 80) {
+      for (let i = 0; i < 3; i++) {
+        const yy = y0 + (y1 - y0) * (.23 + i * .22);
+        const a = project(x0 + 9 + i * 7, yy, z0), b = project(x1 - 17 - i * 14, yy, z0);
+        grain += pen(`M${a.join(' ')}q${(b[0] - a[0]) * .43} ${(b[1] - a[1]) * .35 - .5} ${b[0] - a[0]} ${b[1] - a[1]}`, .45, .46, 'wood');
+      }
+    } else if (z1 - z0 > 80) {
+      for (let i = 0; i < 3; i++) {
+        const xx = x0 + (x1 - x0) * (.2 + i * .24);
+        const a = project(xx, y1, z0 + 16), b = project(xx, y1, z1 - 14 - i * 20);
+        grain += pen(`M${a.join(' ')}Q${(a[0] + b[0]) / 2 + .9} ${(a[1] + b[1]) / 2} ${b.join(' ')}`, .5, .45, 'wood');
+      }
+    }
+    if (x1 - x0 > 80 && y1 - y0 > 20) {
+      const a = project(x0 + 5, y0 + 3, z0), b = project(x1 - 8, y0 + 3, z0);
+      const c = project(x0 + 18, y1 - 6, z0), d = project(x0 + 45, y1 - 7, z0);
+      grain += pen(`M${a.join(' ')}Q${(a[0] + b[0]) / 2} ${(a[1] + b[1]) / 2 - .8} ${b.join(' ')}`, 2.3, .2, color) +
+        pen(`M${c.join(' ')}l${d[0] - c[0]} ${d[1] - c[1]}`, .55, .48);
+      const knot = project(x0 + (x1 - x0) * .69, y0 + (y1 - y0) * .48, z0);
+      grain += pen(`M${knot[0] - 5} ${knot[1]}q5-3 11-.2q-5 3-11 .2m3 0h4`, .42, .43, 'wood');
+    }
+    const long = Math.max(x1 - x0, z1 - z0) > 80;
+    const mainFace = x1 - x0 > 80 ? 2 : 0;
+    const face = faces[mainFace].map(v => project(...v));
+    const minX = Math.min(...face.map(v => v[0])), maxX = Math.max(...face.map(v => v[0]));
+    const minY = Math.min(...face.map(v => v[1])), maxY = Math.max(...face.map(v => v[1]));
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    const width = maxX - minX, height = maxY - minY;
+    let glaze = '', textureDef = '';
+    if (long) {
+      const clip = `@texture-${key}`;
+      textureDef = `<defs><clipPath id="${clip}"><path d="${paths[mainFace]}"/></clipPath></defs>`;
+      glaze = `<g clip-path="url(#${clip})">` +
+        bloom(cx - width * .22, cy + height * .16, width * .34, Math.max(5, height * .48), color, .22, `${key}-pool-left`) +
+        bloom(cx + width * .27, cy - height * .13, width * .19, Math.max(4, height * .39), 'ochre', .15, `${key}-pool-warm`) +
+        bloom(cx + width * .04, cy + height * .27, width * .24, Math.max(3, height * .23), 'indigo', .12, `${key}-pool-dark`) + '</g>';
+      if (y1 - y0 > 20) {
+        for (let i = 0; i < 16; i++) {
+          const t = i < 9 ? .025 + i * .025 : .8 + (i - 9) * .023;
+          let a, b;
+          if (mainFace === 2) {
+            a = project(x0 + (x1 - x0) * t, y0 + 7 + i % 3, z0);
+            b = project(x0 + (x1 - x0) * t + 3, y0 + 1, z0);
+          } else {
+            a = project(side, y0 + 7 + i % 3, z0 + (z1 - z0) * t);
+            b = project(side, y0 + 1, z0 + (z1 - z0) * t + 4);
+          }
+          grain += pen(`M${a.join(' ')}l${b[0] - a[0]} ${b[1] - a[1]}`, .55, .58);
+        }
+      }
+    }
+    const pigment = paths.map((d, i) => fill(d, color, i === mainFace && long ? .26 : [.47, .2, .41][i])).join('') + glaze;
+    const outline = paths.map((d, i) => pen(d, (i === mainFace ? 1.1 : .72) + (z0 < 120 ? .48 : 0), strength)).join('') + grain;
+    // Small joints already have hand-shaped contours; reserve expensive pigment
+    // filtering for the broad planks that visibly benefit from watercolor.
+    return textureDef + paths.map(d => fill(d, 'paper')).join('') +
+      `<g${long ? ' filter="url(#@wash)"' : ''}>${pigment}</g><g>${outline}</g>`;
+  }
+
+
+  function pew(position) {
+    const side = position === 'left' || position === 'right';
+    const near = position === 'near';
+    const sign = position === 'left' ? -1 : 1;
+    const components = [];
+    const add = (bounds, color, name) => components.push({ bounds, color, name, depth: (bounds[4] + bounds[5]) / 2 });
+    if (side) {
+      const a = sign < 0 ? -270 : 218, b = sign < 0 ? -218 : 270;
+      for (const z of [128, 399]) for (const xx of [a + 5, b - 14]) add([xx, xx + 9, 0, 49, z, z + 10], 'wood', `leg-${xx}-${z}`);
+      add([a, b, 44, 52, 117, 432], 'ochre', 'seat');
+      const bx = sign < 0 ? a - 3 : b - 6;
+      for (const z of [129, 402]) add([bx, bx + 9, 47, 134, z, z + 9], 'wood', `post-${z}`);
+      add([bx - 2, bx + 11, 69, 132, 115, 432], 'pine', 'back');
+    } else {
+      const a = near ? -207 : -187, b = near ? 207 : 187;
+      const front = near ? 45 : 460, rear = near ? 112 : 525;
+      for (const x of [a + 12, b - 22]) for (const z of [front + 6, rear - 14]) add([x, x + 10, 0, 48, z, z + 10], 'wood', `leg-${x}-${z}`);
+      add([a, b, 44, 52, front, rear], 'ochre', 'seat');
+      const back = near ? 31 : 531;
+      for (const x of [a + 10, b - 17]) add([x, x + 9, 46, 134, back, back + 9], 'wood', `post-${x}`);
+      add([a - 2, b + 2, 69, 132, back - 1, back + 11], 'pine', 'back');
+    }
+    // Later, closer pieces occlude seats and joints; the near back is drawn last.
+    components.sort((a, b) => b.depth - a.depth || a.bounds[2] - b.bounds[2]);
+    return components.map(({ bounds, color, name }) => timber(...bounds, color, `${position}-${name}`)).join('');
   }
 
   function square(missing = false) {
-    return bench(358, 253, .61) + sideBench() + sideBench(true) +
-      (missing ? pen('M290 368q70-10 140 0', .8, .23, 'wood') : nearBench()) +
-      pen('M319 288 401 287 434 333 286 335Z', .6, .26, 'ochre');
+    return pew('far') + pew('left') + pew('right') + (missing ? '' : pew('near'));
   }
 
   function pine(x, y, scale = 1, angle = 0) {
-    let needles = '';
-    for (let i = 0; i < 15; i++) {
-      const px = i * 10, py = -i * .25 + Math.sin(i * 2.1) * 2.5;
-      needles += pen(`M${px} ${py}l-22-21m23 22-15-27m16 27-4-25m4 27-19 18m20-19-9 25m12-27 4 23`, .7, .65, 'pine');
-    }
-    return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${scale})">` + layers(
-      bloom(60, -3, 87, 24, 'pine', .27, 'pine-needles'),
-      pen('M-30 5Q50-7 146-3M12 0q13-18 36-22M68-2q9 17 34 25M109-3q7-12 30-18', 1.3, .85, 'wood') + needles
-    ) + '</g>';
+    const random = randomFor(`pine-${x}-${y}`);
+    const shoots = [[-8,3,23,-28],[14,0,48,25],[35,-3,70,-34],[63,-5,100,22],[88,-6,126,-28],[116,-5,155,12],[128,-5,156,-12]];
+    let needles = '', puddles = '';
+    shoots.forEach(([ax, ay, bx, by], branch) => {
+      const dx = bx-ax, dy = by-ay, length = Math.hypot(dx, dy), nx = -dy/length, ny = dx/length;
+      needles += pen(`M${ax} ${ay}Q${ax+dx*.65} ${ay+dy*.39} ${bx} ${by}`, .55, .75, 'wood');
+      for (let i=0; i<8; i++) {
+        const t=.14+i*.105, px=ax+dx*t, py=ay+dy*t;
+        for (const side of [-1,1]) {
+          const spread=5+random()*7, forward=7+random()*7;
+          const ex=px+dx/length*forward+nx*spread*side, ey=py+dy/length*forward+ny*spread*side;
+          needles += pen(`M${px.toFixed(1)} ${py.toFixed(1)}Q${(px+dx/length*5+nx*spread*side*.7).toFixed(1)} ${(py+dy/length*5+ny*spread*side*.7).toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`, .42+random()*.26, .55+random()*.3, i%3===0?'ink':'pine');
+          if (i%3===1) puddles += fill(`M${px.toFixed(1)} ${py.toFixed(1)}Q${(px+nx*spread*side*.7).toFixed(1)} ${(py+ny*spread*side*.7).toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}L${(px+dx/length*4).toFixed(1)} ${(py+dy/length*4).toFixed(1)}Z`, 'pine', .2);
+        }
+      }
+      puddles += bloom(ax+dx*.64,ay+dy*.62,11,8,'pine',.13,`pine-pool-${branch}`);
+    });
+    return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${scale})">` + layers(puddles,
+      pen('M-31 5Q8-2 49-4T145-5', 1.15, .81, 'wood') +
+      pen('M-25 6Q24 0 60-3m25-1 36-1', .42, .55) + needles) + '</g>';
   }
 
   function cone(x, y, scale = 1) {
-    let scales = '';
-    for (let i = 0; i < 5; i++) {
-      const yy = i * 7 - 15, half = 11 - Math.abs(i - 2) * 2;
-      scales += pen(`M${-half} ${yy}q${half / 2} 9 ${half} 0q${half / 2} 9 ${half} 0M0 ${yy}v4`, .7, .7);
+    const shell='M0-26Q9-25 14-13Q24 1 16 16Q10 31-4 27Q-20 21-19 7Q-20-13-6-24Z';
+    const random=randomFor(`cone-${x}-${y}`);
+    let scales='', pigment='';
+    for (let row=0; row<7; row++) {
+      const yy=-20+row*6.1, half=3.5+Math.sin((row+.7)/7*Math.PI)*12;
+      for (let col=-1; col<2; col++) {
+        const xx=col*half*.66+(row%2?2:-1), width=4+random()*3;
+        scales+=pen(`M${(xx-width).toFixed(1)} ${yy.toFixed(1)}q${width.toFixed(1)} ${(5+random()*3).toFixed(1)} ${(width*2).toFixed(1)} -.6m${(-width*1.6).toFixed(1)} -1.6q${(width*.5).toFixed(1)} 3.5 ${width.toFixed(1)} .8`,.45+random()*.22,.7+random()*.15);
+        if(col<1) pigment+=fill(`M${xx-width} ${yy}q${width} 7 ${width*2} 0l-${width*.6} 6-${width*.9}-1Z`,'rust',.24);
+      }
     }
     return `<g transform="translate(${x} ${y}) rotate(22) scale(${scale})">` + layers(
-      fill('M0-24Q25-5 14 20Q0 34-14 20Q-26-6 0-24Z', 'wood', .54),
-      pen('M0-24Q25-5 14 20Q0 34-14 20Q-26-6 0-24Z', 1) + scales
-    ) + '</g>';
+      fill(shell,'ochre',.28)+fill('M-5-24Q-24-5-15 16Q-11 25-3 27L1 16Q-9 1-5-24Z','wood',.38)+pigment,
+      pen('M-5-24Q-19-16-19 4m1 8Q-13 28-1 27m8-1q9-7 10-17M14-14q-4-11-13-12',.93,.88)+scales+
+      pen('M-3-26q1-4 6-5',.8,.71,'wood'))+'</g>';
   }
 
   function musicLine(x, y, width, variation = 0) {
@@ -163,36 +278,72 @@
   }
 
   function book(x, y, scale = 1, angle = 0, variation = 0) {
-    const left = 'M0 7Q-68-16-132 5L-130 115Q-65 91 0 116Z';
-    const right = 'M0 7Q63-17 127 3L133 112Q64 92 0 116Z';
-    let notes = '';
-    for (let row = 0; row < 3; row++) {
-      notes += musicLine(-114, 32 + row * 25, 91, row + variation) + musicLine(21, 31 + row * 25, 91, row + variation + 1);
+    const left='M-1 10Q-65-16-130 5L-128 112Q-66 90-2 115Q-8 63-1 10Z';
+    const right='M1 10Q59-17 126 1L132 108Q69 89-2 115Q5 59 1 10Z';
+    const cover='M-140 13Q-71-13-1 16Q63-12 137 9L143 121Q69 100-2 126Q-71 104-136 128Z';
+    const clip=`@texture-open-book-${x}-${y}-${variation}`;
+    let notes='', edgeHatching='';
+    for(let row=0;row<3;row++) notes+=musicLine(-112,31+row*25,88,row+variation)+musicLine(20,29+row*25,90,row+variation+1);
+    for(let i=0;i<18;i++) {
+      const yy=17+i*5.4;
+      edgeHatching+=pen(`M-126 ${yy.toFixed(1)}l${4+i%3} -2M128 ${(yy-2).toFixed(1)}l-5 -2`,.32,.39,'wood');
     }
-    return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${scale})">` +
-      layers(fill('M-141 12Q-69-15 0 13Q69-15 138 9L144 122Q67 102 0 125Q-67 103-137 128Z', 'rust', .66),
-        pen('M-141 12Q-69-15 0 13Q69-15 138 9L144 122Q67 102 0 125Q-67 103-137 128Z', 1.5)) +
-      fill(left, 'paper') + fill(right, 'paper') +
-      layers(fill('M-132 5Q-110 9-101 5L-103 110-130 115Z', 'ochre', .19) +
-        fill('M0 7Q10 38 3 113L-7 113Q-16 45 0 7Z', 'wood', .17) +
-        bloom(82, 80, 43, 37, 'ochre', .10, 'page-stain'),
-        pen(left + right, 1.3, .9) + pen('M0 10q-6 48 0 103M-128 120q66-25 125-1M6 119q63-22 127-1M-119 16q43-10 94-1M22 15q44-10 91 0', .6, .63) + notes) +
-      pen('M-137 27l2 79m271-76 2 79M-121 111l22-6M119 99l3 13', .7, .55, 'rust') + '</g>';
+    return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${scale})">`+
+      `<defs><clipPath id="${clip}"><path d="${left}${right}"/></clipPath></defs>`+
+      layers(fill(cover,'rust',.42)+fill('M-136 118Q-72 95-2 120Q73 95 139 112L143 121Q69 100-2 126Q-71 104-136 128Z','wood',.25),
+        pen('M-139 13l3 94m0 11 0 10Q-71 104-2 126Q69 100 143 121l-6-110',1.15,.86))+
+      fill(left,'paper')+fill(right,'paper')+
+      layers(`<g clip-path="url(#${clip})">`+
+        fill('M-1 10Q-8 32-5 63L-2 115-13 110Q-22 58-7 6Z','wood',.14)+
+        fill('M-131 5Q-117 10-110 7L-113 103-127 112Z','ochre',.16)+
+        bloom(108,104,37,14,'ochre',.12,`page-foot-${variation}`)+
+        bloom(-84,5,34,10,'ochre',.11,`page-head-${variation}`)+
+        bloom(104,35,15,19,'wood',.055,`page-side-${variation}`)+'</g>',
+        pen('M-1 10Q-62-15-130 5l1 63m1 16v28Q-69 91-2 115Q68 89 132 108l-4-71m-2-18V1Q63-16 1 10',.92,.82)+
+        pen('M-1 12q-7 50-1 100M-127 119q62-24 122 1M6 119q61-23 126-5M-122 122q58-23 119 1M7 123q57-22 126-5',.42,.63)+
+        pen('M-116 18q39-12 87-2M22 14q42-11 88-1M110 100l12-3 5 10m-5-9 1 7M-123 7l8 1-4 7',.43,.59,'wood')+
+        edgeHatching+notes)+
+      pen('M-136 38l2 55M138 52l1 45M-128 112q48-16 74-11M24 113q42-14 63-11',.4,.53,'rust')+'</g>';
   }
 
   function closedBook(x, y, scale = 1, angle = 0) {
-    return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${scale})">` + layers(
-      fill('M-133-24 77-46 133-15-74 14Z', 'pine', .70) + bloom(-15, -12, 94, 12, 'indigo', .2, 'book-cloth') +
-      fill('M-74 14 133-15 132 18-72 49Z', 'light', .68) +
-      fill('M-133-24-74 14-72 49-131 6Z', 'pine', .85) +
-      fill('M-73 49 133 18 141 26-72 59-140 11-131 6Z', 'rust', .57),
-      pen('M-133-24 77-46 133-15 132 18 141 26-72 59-140 11-133-24-74 14 133-15M-74 14-72 59M-132 6-73 49 132 18', 1.5) +
-      pen('M-70 22 121-6M-70 29 127 1M-70 36 122 9M-69 42 127 15M-114-23 74-40 109-18-74 7Z', .65, .64) +
-      pen('M-46-18l70-8m-48 0 50-6m-29 22 39-6M-123-10l38 24m-40-14 38 25', .6, .86, 'ochre') + pen('M-109-20l16 4m4-7 19 6m6-9 11 4m4-7 23 5m9-7 12 3M-114-17l39 23m-35-14 29 17M67-37l22 10m-12-3 19 9', .45, .46) +
-      pen('M-114-23 74-40 109-18-74 7Z M-100-22l4 3-7 3m178-19-4 4 8 2M-71 1l3-4-8-1M99-19l-5-1 1 4', .65, .8, 'ochre') +
-      pen('M-46-23l34-5m-25 8 40-6m-13 9 30-5M-81-10l3 2m3-5 3 2m3-4 3 2m28-12 4 2m5-4 3 2m9-4 4 2m13-3 3 2m5-3 4 2', .5, .43) +
-      pen('M38 30 42 66 52 57 61 63 57 27', 1.1, .85, 'rust')
-    ) + '</g>';
+    const cover='M-130-25Q-118-27-109-27L73-46Q79-47 85-43L131-18Q138-13 130-10L-66 19Q-75 21-81 15L-128-16Q-136-20-130-25Z';
+    const spine='M-128-18Q-100-2-79 13Q-74 19-74 28L-73 50Q-78 55-83 51L-129 17Q-136 10-134-1Z';
+    const pages='M-71 20Q32 5 130-10L128 20Q38 29-72 48Q-68 34-71 20Z';
+    const bottom='M-132 10-76 47Q-69 51-63 49L128 20Q140 19 141 27L-69 61Q-76 63-84 57L-138 19Z';
+    const clip=`@texture-closed-book-${x}-${y}`;
+    const random=randomFor(`binding-${x}-${y}`);
+    let details='', grain='';
+    for(let i=0;i<8;i++) {
+      const yy=23+i*3.1;
+      details+=pen(`M${-69+i%2} ${yy.toFixed(1)}Q${(7+i%3*4).toFixed(1)} ${(yy-9).toFixed(1)} ${121+i%3*3} ${(yy-30).toFixed(1)}`, .28+(i%3)*.08,.54+(i%2)*.12,'wood');
+    }
+    for(let i=0;i<37;i++) {
+      const px=-97+random()*193, py=-13+(px+97)*-.115+random()*18;
+      grain+=pen(`M${px.toFixed(1)} ${py.toFixed(1)}q${(2+random()*4).toFixed(1)} -1.7 ${(4+random()*4).toFixed(1)} -.5`,.26,.22,i%3===0?'ochre':'ink');
+    }
+    // A few dark nicks and pooled edges carry the age; broad pale areas survive.
+    return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${scale})">`+
+      `<defs><clipPath id="${clip}"><path d="${cover}"/></clipPath></defs>`+
+      fill(bottom,'paper')+fill(pages,'paper')+layers(
+        fill(bottom,'rust',.34)+fill(pages,'light',.37)+fill(spine,'pine',.68)+fill(cover,'pine',.53)+
+        `<g clip-path="url(#${clip})">`+
+        fill('M-130-25Q-102-28-78-31L73-46 89-36Q-10-24-80-15L-72 17-83 12Z','pine',.13)+
+        bloom(-79,-14,39,17,'pine',.3,'binding-spine-pool')+
+        bloom(73,-27,55,13,'indigo',.18,'binding-corner-pool')+
+        bloom(15,0,46,9,'ochre',.1,'binding-dry-edge')+'</g>'+
+        fill('M-73 42Q34 27 126 14L128 20Q38 29-72 48Z','ochre',.23)+
+        fill('M-130-3Q-105 8-77 33L-77 45Q-104 22-132 12Z','indigo',.18),
+        pen('M-128-25Q-117-28-109-27L73-46q6-1 12 3l46 25q7 5-1 8L-66 19q-9 2-15-4l-47-31',1.08,.86)+
+        pen('M-127-15Q-136-9-133 7l1 6 49 39q5 5 10-2l1-27M-72 50q103-17 200-30l2-30M-134 13l-4 6 54 38q8 6 15 4l210-34q-2-6-9-7',1.48,.87)+
+        pen('M-112-23 75-41 118-16-70 12Z M-108-20 74-38m-3 1 37 20M-101-16l-7 1 7 3m166-26 4 3 7 1M-74 7l3-4-8-1M104-16l-6 1 2 3',.54,.72,'ochre')+
+        pen('M-125-13q-6 9-3 18M-118-7q-7 8-4 19M-100 6q-6 8-4 18M-82 18q-5 8-3 18',.85,.63,'ochre')+
+        pen('M-127-8l1 9m5-7-1 11m4-8v12M-102 11l-1 9m5-7 1 12M-82 29v9m4-6 1 12',.38,.57)+
+        pen('M-47-17l66-9m-55 13 45-6m-23 9 31-5',.63,.69,'ochre')+
+        pen('M-124-23l9-1m181-20 9-1M123-14l6-1m-193 32 9-1M-128 16l7 4M-79 53l5 3m7 1 18-3',.65,.88)+
+        details+grain)+
+      fill('M34 35 38 65 48 57 56 61 53 32Z','rust',.45)+
+      pen('M34 35l4 30 10-8 8 4-3-29M39 39l4 17',.7,.75,'rust')+'</g>';
   }
 
   function candle(x, y, scale = 1, flame = true) {
@@ -226,96 +377,139 @@
   }
 
   const ground = (key, dark = false) => layers(
-    bloom(355, 367, 239, 55, dark ? 'indigo' : 'wood', dark ? .26 : .14, key) +
-    bloom(377, 385, 155, 24, 'pine', .1, `${key}-pool`), '');
+    bloom(310, 405, 202, 14, dark ? 'indigo' : 'wood', dark ? .1 : .075, `${key}-floor`) +
+    bloom(528, 373, 69, 17, 'pine', .07, `${key}-side`), '');
+
+  function table(key, deep = false) {
+    return layers(
+      fill('M115 316Q207 296 319 319T613 304L633 393Q512 417 410 397T104 405Z', 'wood', deep ? .16 : .09) +
+      bloom(383, 378, 225, 25, 'ochre', .14, `${key}-table`) +
+      bloom(454, 381, 126, 18, 'wood', deep ? .19 : .1, `${key}-pool`),
+      pen('M117 346q68-12 110-5m12-1q156-18 258-5m15 0 76-7M122 381q79-3 111-10m19-3q76-3 126-6m14 0 72-5m13 0 92-5M118 402l24-3m9-1 55-5m224 8 40-3m17-1 97-8', .55, .38, 'wood') +
+      pen('M153 365q16-11 37-4q-22 1-37 4m6-1 20-1M504 385q12-8 36-5m-30 3 14-2', .45, .4, 'wood')
+    );
+  }
+
+  function scrap(x, y, scale = 1, angle = 0, variant = 0) {
+    return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${scale})">` +
+      fill('M-44-15 38-20 43 22 34 25 29 31 18 25 7 32-4 26-19 32-27 25-41 30Z', 'light', .6) +
+      musicLine(-32, -4, 64, variant) + pen('M-39-13 37-19M40 22l-6 3-5 6-11-6-11 7m-29-11-8 6', .55, .58, 'wood') + '</g>';
+  }
+
+  function leaves(x, y, scale = 1, angle = 0) {
+    let pigment = '', lines = pen('M-22 7Q38-8 119-39M30-8l-4-30M62-18l18 16', .75, .55, 'wood');
+    for (let i = 0; i < 8; i++) {
+      const xx = i * 15, yy = -i * 5;
+      const d = i % 2 ? `M${xx} ${yy}q-14-23 4-31q13 16-4 31Z` : `M${xx} ${yy}q4 20 24 16q-1-19-24-16Z`;
+      pigment += fill(d, 'pine', .17 + i % 3 * .03);
+      lines += pen(d, .55, .49, 'pine') + pen(`M${xx} ${yy}l${i % 2 ? 3 : 14} ${i % 2 ? -21 : 10}`, .35, .38, 'wood');
+    }
+    return `<g transform="translate(${x} ${y}) rotate(${angle}) scale(${scale})">${layers(pigment, lines)}</g>`;
+  }
+
+  function lectern(x, y, scale = 1) {
+    return `<g transform="translate(${x} ${y}) scale(${scale})">` + layers(
+      fill('M-90-80 46-107 103-74-38-42Z', 'wood', .25) +
+      fill('M-9-50 9-54 17 66 0 74-17 70Z', 'pine', .32) +
+      fill('M-52 79 48 62 72 72-42 94-65 88Z', 'wood', .28),
+      pen('M-90-80 46-107 103-74-38-42Z M-89-80l1 8 49 39 143-33v-8M-38-42v9', 1.2, .88) +
+      pen('M-9-45Q-4-12-12 20L-17 70 0 74 17 66Q9 23 9-49M-52 79 48 62 72 72-42 94-65 88Z', 1.2, .82) +
+      pen('M-80-77l43 30 108-25M-8 61l3-34m7-19-1-25M-44 80l41-7m17-4 27-5m-63 23 64-12', .55, .59, 'wood')
+    ) + '</g>';
+  }
 
   const scenes = {
     title() {
-      return ground('title') + layers(
-        bloom(377, 346, 257, 61, 'ochre', .21, 'title-table') +
-        bloom(425, 346, 158, 44, 'wood', .18, 'title-pool'),
-        pen('M116 368q228-34 475-8m-442 19q218-25 404-15M177 394l53-5m255-7 66-5', .65, .49, 'wood')) +
-        candle(204, 298, 1.62) + closedBook(407, 314, 1.35, -8) +
-        `<g transform="translate(535 377) rotate(-17)">` +
-        fill('M-45-14 39-20 44 23 34 25 29 31 18 25 7 32-4 26-19 32-27 25-41 30Z', 'light', .75) +
-        musicLine(-33, -5, 65, 2) + pen('M-39-13 37-19M41 22l-7 3-5 6-11-6-11 7', .65, .62) + '</g>' +
-        pine(247, 386, 1.18, -15) + pine(238, 384, .75, -135) + cone(366, 408, .88);
+      return table('title') + candle(205, 290, 1.68) + closedBook(409, 312, 1.36, -8) +
+        scrap(535, 374, 1, -17, 2) + pine(248, 384, 1.14, -15) +
+        pine(238, 384, .76, -135) + cone(366, 408, .88);
     },
-    meetinghouse() { return room() + ground('meeting') + square() + pen('M359 183v20m-7-12h14', .7, .52, 'wood'); },
+    meetinghouse() {
+      return room() + ground('meeting') + square() + closedBook(337, 291, .37, -9) + candle(406, 287, .42);
+    },
     wrongPages() {
-      return room() + ground('pages') + square() + book(245, 288, .48, 21, 0) +
-        book(486, 286, .46, -18, 2) + book(357, 359, .65, -6, 3);
+      return layers(
+        fill('M106 133Q295 110 620 126L603 219 120 212Z', 'ochre', .085) +
+        bloom(157, 217, 37, 79, 'pine', .11, 'pages-left'),
+        pen('M135 134q119-7 206-2m25 0 220 1M119 166l41 0m16-1 74 0m228 0 70 1M112 218l24-2m423 2 40 2', .6, .37, 'wood')) +
+        `<g transform="translate(-144 -27) scale(1.4)">${pew('far')}</g>` +
+        book(212, 240, .48, -7, 0) + book(370, 241, .48, 3, 2) + book(529, 245, .46, 8, 3) +
+        pen('M257 303q9 14 1 30l9-7 5 5-1-29M494 302q-7 15-3 25', .95, .66, 'rust') +
+        layers(bloom(356, 330, 201, 16, 'wood', .09, 'pages-shadow'), '');
     },
     thumbprint() {
       let ridges = '';
-      for (let i = 0; i < 9; i++) {
-        ridges += pen(`M${-20 - i * 1.8} ${8 + i * 2}C${-34 - i * 2} ${-32 - i * 3} ${31 + i * 2} ${-43 - i * 3} ${24 + i * 2} ${5 + i * 3}Q${17 + i * 2} ${31 + i * 2} ${-5 - i} ${27 + i * 2}`, .9, .48);
-      }
-      return layers(bloom(151, 193, 72, 113, 'pine', .15, 'thumb-bg') + bloom(571, 229, 91, 156, 'wood', .14, 'thumb-edge'), '') +
-        ground('thumb') + book(355, 155, 1.67, -8) +
-        `<g transform="translate(410 267) rotate(24)">` + layers(bloom(0, 0, 34, 48, 'ink', .48, 'thumb-ink'), ridges) + '</g>' +
-        pen('M116 377l72-9m342-59 36-7m-31 12 25-5', .6, .45, 'rust');
+      for (let i = 0; i < 9; i++) ridges += pen(`M${-20 - i * 1.8} ${8 + i * 2}C${-34 - i * 2} ${-32 - i * 3} ${31 + i * 2} ${-43 - i * 3} ${24 + i * 2} ${5 + i * 3}Q${17 + i * 2} ${31 + i * 2} ${-5 - i} ${27 + i * 2}`, .8, .5);
+      return leaves(135, 112, 1.18, -9) + leaves(591, 133, .83, 166) + table('thumb') +
+        book(355, 152, 1.65, -8) +
+        `<g transform="translate(407 272) rotate(24)">${layers(bloom(0, 0, 34, 47, 'ink', .49, 'thumb-ink'), ridges)}</g>` +
+        pen('M116 377l72-9m342-59 36-7m-31 12 25-5', .55, .43, 'rust');
     },
     emptyChair() {
-      return room() + bench(281, 258, .65) + sideBench() +
-        layers(fill('M381 278Q351 348 458 419L566 419 432 280Z', 'indigo', .21), '') +
-        ground('chair') + layers(
-          fill('M174 284Q184 267 211 279L223 327 215 330 212 340 204 335 196 342 186 335Z', 'rust', .42),
-          pen('M174 284q12-14 37-5l12 48m-41-40 15 49m-7-45 16 42m-10-45 17 39', .75, .55, 'rust')) +
-        chair(394, 322, 1.1);
+      return `<g opacity=".56" transform="translate(74 6) scale(.82)">${room()}${pew('far')}</g>` +
+        layers(fill('M247 335Q302 350 477 409L429 425 228 374Z', 'indigo', .14) +
+          bloom(265, 394, 111, 15, 'wood', .11, 'chair-contact'), '') +
+        chair(282, 321, 1.39) +
+        layers(fill('M304 196Q318 187 329 199L340 260 332 271 324 264 316 278 307 269Z', 'rust', .47),
+          pen('M304 196q14-9 25 3l11 61m-31-58 10 60m-4-58 11 59m-4-61 12 56M307 269l9 9 8-14 8 7 8-11', .7, .69, 'rust')) +
+        candle(499, 353, .94);
     },
     pencilNote() {
-      return layers(bloom(537, 200, 89, 114, 'pine', .17, 'pencil-bg') + bloom(163, 288, 91, 77, 'ochre', .18, 'pencil-wash'), '') +
-        ground('pencil') + book(353, 160, 1.62, 6) +
-        layers(fill('M394 327 557 180 565 190 402 337 382 345Z', 'ochre', .58),
-          pen('M394 327 557 180 565 190 402 337 382 345Z M394 327l8 10M549 188l8 9M557 180l7-6 8 9-7 7', 1.15) +
-          pen('M399 328 558 188M383 344l8-5', .7, .75)) +
-        pen('M189 308q7-13 10-1t9-5q7-7 6 3t12-3m-40 18q16-5 44 1M194 342q10-4 36 0', .85, .7, 'wood');
+      return table('pencil') + book(344, 147, 1.66, 5) +
+        layers(fill('M398 332 560 181 568 191 406 342 384 351Z', 'ochre', .53),
+          pen('M398 332 560 181 568 191 406 342 384 351Z M398 332l8 10M552 189l8 9M560 181l7-6 8 9-7 7', 1.0, .86) +
+          pen('M403 333 561 189M385 350l8-5M410 334l143-137', .55, .66, 'wood')) +
+        pen('M189 308q7-13 10-1t9-5q7-7 6 3t12-3m-40 18q16-5 44 1M194 342q10-4 36 0', .75, .74, 'wood') +
+        scrap(564, 379, .56, 18, 3);
     },
     floorboards() {
       let grain = '';
-      for (let i = 0; i < 10; i++) {
-        grain += pen(`M${88 + i * 50} 275Q${108 + i * 46} 344 ${61 + i * 63} 418`, 1.1, .65, 'wood') +
-          pen(`M${94 + i * 50} 296l-5 27m${-3 + i} 10-8 45`, .6, .45, 'wood');
+      for (let i = 0; i < 9; i++) {
+        const a = 114 + i * 54, b = 86 + i * 68;
+        grain += pen(`M${a} 258Q${a + 13} 342 ${b} 418`, .75, .55, 'wood') +
+          pen(`M${a + 5} 281q7 42 1 61m-1 9-4 32`, .4, .38, 'wood');
       }
-      return room(true) + bench(359, 245, .74) + layers(
-        fill('M80 274 631 269 654 418 59 418Z', 'wood', .18) +
-        fill('M272 342Q358 326 447 342L449 355Q357 345 266 359Z', 'ink', .61) +
-        bloom(357, 347, 127, 42, 'pine', .22, 'floor-voice'),
-        grain + pen('M82 285Q348 273 634 284M66 410q296-21 584 1M269 341q86-14 179 1M266 359q89-16 183-4', 1, .8) +
-        pen('M168 334q16-16 32-2t-31 8m4-4 23-1M504 391q16-13 30-1t-28 6', .65, .6)) +
-        `<g transform="translate(179 377) rotate(-16)">` + fill('M-28-17 21-20 30 20 17 18 11 24-1 17-13 23-26 18Z', 'light', .39) + musicLine(-23, -10, 44, 1) + '</g>';
+      return layers(fill('M110 244Q357 229 606 246L642 414 83 424Z', 'wood', .11) +
+        bloom(425, 292, 172, 33, 'indigo', .11, 'below-bench'), '') +
+        `<g transform="translate(-126 -247) scale(1.35)">${pew('near')}</g>` +
+        layers(fill('M207 337Q353 314 502 331L514 341Q362 326 202 349Z', 'ink', .5) +
+          bloom(359, 339, 127, 14, 'pine', .16, 'floor-voice'),
+          grain + pen('M204 337q132-23 298-6M202 350q157-26 312-9M143 392l71-6m269-2 82-6', .8, .61) +
+          pen('M437 385q19-15 44-5q-15 6-39 9m4-3 24-3', .55, .56, 'wood')) +
+        candle(161, 369, .94) + scrap(551, 379, .65, 13, 1);
     },
     heavyBook() {
-      return room(true) + ground('heavy', true) +
-        layers(fill('M146 348Q367 316 574 347L585 394 133 398Z', 'wood', .17),
-          pen('M147 351q209-37 429-2M143 368q219-26 434-3M135 393q222-19 448-3', .7, .52, 'wood')) +
-        closedBook(355, 298, 1.46, -6) + pine(480, 366, .7, -13) + cone(565, 368, .6) + pen('M248 391q47-7 91-4m83-11 69-8', .75, .6);
+      return table('heavy', true) + candle(184, 268, 1.18) +
+        closedBook(374, 296, 1.58, -8) + pine(493, 374, .69, -17) + cone(572, 372, .61) +
+        pen('M192 390q64-8 128-11l18 4 22-8 29 4 37-9 73 2M241 399l56-4m126-12 63-7', .75, .54, 'wood');
     },
     threeBenches() {
-      return room(true) + ground('missing', true) + square(true) + candle(307, 308, .24) + candle(409, 308, .24) + candle(297, 353, .29) + candle(428, 353, .29) +
-        layers(bloom(359, 365, 114, 26, 'light', .07, 'missing-light'), '') +
-        pen('M310 361l11-2m80 0 12 2M278 392l4-7m150-3 4 7', .85, .43, 'wood');
+      return `<g transform="translate(0 -12)">${room(true)}${ground('missing')}${square(true)}</g>` +
+        candle(302, 295, .29) + candle(420, 295, .29) + candle(279, 344, .34) + candle(446, 344, .34) +
+        pen('M260 394l16-1m153-1 17 1M259 397l3 9m178-9-3 10', .6, .4, 'wood');
     },
     closedBook() {
-      return room(true) + sideBench() + sideBench(true) + ground('leader') +
-        layers(fill('M269 281 402 270 450 300 314 317Z', 'wood', .3) + fill('M345 314 359 315 365 398 350 400Z', 'pine', .43),
-          pen('M269 281 402 270 450 300 314 317Z M314 317v8L450 307v-7M345 321l5 79m9-82 6 80M320 403l70-9m-67 13 67-9', 1.4)) +
-        closedBook(358, 266, .7, -3);
+      return `<g opacity=".43" transform="translate(20 -13) scale(.9)">${room(true)}${pew('far')}${pew('left')}</g>` +
+        layers(bloom(437, 410, 125, 15, 'indigo', .13, 'lectern-contact'), '') +
+        lectern(425, 302, 1.13) + candle(520, 213, .45) + closedBook(424, 205, .77, -8);
     },
     wrongShadow() {
-      return layers(bloom(422, 228, 185, 147, 'pine', .23, 'shadow-wall'), '') +
-        `<g class="art-shadow">${layers(
-          fill('M370 282Q400 250 395 225L383 212 383 197 369 195Q366 189 378 180L379 160Q386 117 428 126Q463 132 458 169L453 202Q482 225 518 239L548 319Z', 'ink', .62) +
-          bloom(456, 267, 82, 57, 'indigo', .22, 'shadow-edge'),
-          pen('M378 180l-9 12 14 5v15l12 13M453 202q34 28 65 37', .85, .52))}</g>` +
-        ground('shadow', true) + candle(219, 328, 1.56, false) + closedBook(428, 350, 1.18, -9);
+      const shadow = 'M370 282Q400 250 395 225L383 212 383 197 369 195Q366 189 378 180L379 160Q386 117 428 126Q463 132 458 169L453 202Q482 225 518 239L548 319Z';
+      let scratches = '';
+      for (let i = 0; i < 19; i++) scratches += pen(`M${410 + i * 5} ${211 + i * 2}l-9 29m5-15-7 23`, .55, .2, 'paper');
+      return layers(fill('M218 134Q428 104 569 147L598 329 280 330Z', 'ochre', .08),
+        pen('M225 174l69-6m177-8 70 7M239 211l48-4m186 4 59 4M258 258l81-3m157 11 45 5', .55, .33, 'wood')) +
+        `<defs><clipPath id="@texture-shadow"><path d="${shadow}"/></clipPath></defs>` +
+        `<g class="art-shadow">${layers(fill(shadow, 'ink', .57) +
+          `<g clip-path="url(#@texture-shadow)">${bloom(441, 254, 85, 57, 'indigo', .24, 'shadow-edge')}</g>`,
+          pen('M378 180l-9 12 14 5v15l12 13M453 202q34 28 65 37', .75, .47) +
+          `<g clip-path="url(#@texture-shadow)">${scratches}</g>`)}</g>` +
+        table('shadow', true) + candle(213, 325, 1.57, false) + closedBook(435, 352, 1.21, -9);
     },
     placeInSquare() {
-      return room(true) + ground('last', true) + square() +
-        layers(bloom(358, 316, 45, 40, 'light', .16, 'empty-light'), '') +
-        pen('M333 308q25-7 50-1M332 311l-10 19q33-5 70-1l-9-19', .65, .45, 'wood') +
-        candle(564, 337, .9);
+      return `<g opacity=".68">${room(true)}</g>` + ground('last') + square() +
+        layers(fill('M306 274Q350 266 410 281L443 321Q373 330 296 317Z', 'light', .085), '') +
+        pen('M324 302l13-2m60 3 12 2M315 315l14-1m68 2 13 2', .55, .37, 'wood') + candle(459, 307, .58);
     }
   };
 
@@ -324,31 +518,26 @@
     const id = `hollow-art-${scene}`;
     const seed = Object.keys(scenes).indexOf(scene) + 17;
     const body = scenes[scene]();
-    const atmosphere = layers(
-      fill('M106 176Q170 123 213 192L188 331Q129 353 104 291Z', 'ochre', .055) +
-      bloom(563, 295, 67, 115, 'pine', .055, `${scene}-edge`), '');
     return `<svg class="programmatic-art" viewBox="0 0 720 468" role="img" aria-label="${escapeAttribute(label)}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter id="${id}-wash" x="-12%" y="-16%" width="124%" height="132%" color-interpolation-filters="sRGB">
           <feTurbulence type="fractalNoise" baseFrequency=".025 .045" numOctaves="3" seed="${seed}" result="flow"/>
-          <feDisplacementMap in="SourceGraphic" in2="flow" scale="9" xChannelSelector="R" yChannelSelector="G" result="spread"/>
-          <feColorMatrix in="flow" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  .8 0 0 0 .38" result="wetness"/>
-          <feComposite in="spread" in2="wetness" operator="in" result="settled"/>
+          <feDisplacementMap in="SourceGraphic" in2="flow" scale="5" xChannelSelector="R" yChannelSelector="G" result="spread"/>
           <feTurbulence type="fractalNoise" baseFrequency=".48" numOctaves="3" seed="${seed + 3}" result="grain"/>
           <feColorMatrix in="grain" type="saturate" values="0"/>
           <feComponentTransfer result="granulation">
-            <feFuncR type="table" tableValues=".65 1"/><feFuncG type="table" tableValues=".65 1"/><feFuncB type="table" tableValues=".65 1"/><feFuncA type="table" tableValues="1 1"/>
+            <feFuncR type="table" tableValues=".82 1"/><feFuncG type="table" tableValues=".82 1"/><feFuncB type="table" tableValues=".82 1"/><feFuncA type="table" tableValues="1 1"/>
           </feComponentTransfer>
-          <feComposite in="settled" in2="granulation" operator="arithmetic" k1="1" k2="0" k3="0" k4="0"/>
+          <feComposite in="spread" in2="granulation" operator="arithmetic" k1="1" k2="0" k3="0" k4="0"/>
         </filter>
         <filter id="${id}-pen" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB">
           <feTurbulence type="fractalNoise" baseFrequency=".14" numOctaves="2" seed="8" result="tooth"/>
           <feDisplacementMap in="SourceGraphic" in2="tooth" scale=".85" xChannelSelector="R" yChannelSelector="G"/>
         </filter>
       </defs>
-      <g stroke-linecap="round" stroke-linejoin="round">${atmosphere}${body}</g>
+      <g stroke-linecap="round" stroke-linejoin="round">${body}</g>
       ${flecks(scene)}
-    </svg>`.replaceAll('#@wash', `#${id}-wash`).replaceAll('#@pen', `#${id}-pen`);
+    </svg>`.replaceAll('#@wash', `#${id}-wash`).replaceAll('#@pen', `#${id}-pen`).replaceAll('@texture-', `${id}-texture-`);
   }
 
   window.HollowArt = {

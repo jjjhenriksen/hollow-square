@@ -126,13 +126,15 @@ test('title and every story coexist with unique, locally resolved paint servers'
       const unresolved = [];
       for (const svg of svgs) {
         const localIds = new Set([...svg.querySelectorAll('[id]')].map(node => node.id));
-        for (const node of svg.querySelectorAll('[filter], [fill], [stroke]')) {
-          for (const attribute of ['filter', 'fill', 'stroke']) {
+        for (const node of svg.querySelectorAll('*')) {
+          for (const attribute of ['filter', 'fill', 'stroke', 'mask', 'clip-path', 'marker-start', 'marker-mid', 'marker-end', 'style']) {
             const value = node.getAttribute(attribute) || '';
             for (const match of value.matchAll(/url\(\s*["']?#([^\s)"']+)["']?\s*\)/g)) {
               if (!localIds.has(match[1])) unresolved.push(match[1]);
             }
           }
+          const href = node.getAttribute('href') || node.getAttribute('xlink:href') || '';
+          if (href.startsWith('#') && !localIds.has(href.slice(1))) unresolved.push(href.slice(1));
         }
       }
       const bounds = svgs[1].getBoundingClientRect();
@@ -148,7 +150,7 @@ test('title and every story coexist with unique, locally resolved paint servers'
   await testInfo.attach('rendered-final-story', { body: await page.locator('#story-illustration').screenshot(), contentType: 'image/png' });
 });
 
-test('visible candle art moves and hidden title art pauses', async ({ page }) => {
+test('visible candle art moves and hidden title and story art pause', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   const flame = page.locator('#title-art .art-flame');
@@ -167,6 +169,25 @@ test('visible candle art moves and hidden title art pauses', async ({ page }) =>
     .evaluateAll(nodes => nodes.flatMap(node => getComputedStyle(node).animationPlayState.split(',').map(state => state.trim())));
   expect(states.length).toBeGreaterThan(0);
   expect(states.every(state => state === 'paused')).toBe(true);
+
+  await page.evaluate(() => showStory(10));
+  const storyEffects = page.locator('#story-illustration .art-smoke, #story-illustration .art-shadow');
+  const active = await storyEffects.evaluateAll(nodes => nodes.map(node => ({
+    classes: [...node.classList], names: getComputedStyle(node).animationName.split(',').map(name => name.trim()),
+    states: node.getAnimations().map(animation => animation.playState)
+  })));
+  expect(active.flatMap(effect => effect.classes)).toEqual(expect.arrayContaining(['art-smoke', 'art-shadow']));
+  for (const effect of active) {
+    expect(effect.names).not.toContain('none');
+    expect(effect.states.length).toBeGreaterThan(0);
+    expect(effect.states.every(state => state === 'running')).toBe(true);
+  }
+  await page.locator('header [data-action="home"]').click();
+  await expect(page.locator('#story')).toBeHidden();
+  const storyStates = await storyEffects.evaluateAll(nodes => nodes.flatMap(node =>
+    getComputedStyle(node).animationPlayState.split(',').map(state => state.trim())));
+  expect(storyStates.length).toBeGreaterThan(0);
+  expect(storyStates.every(state => state === 'paused')).toBe(true);
 });
 
 test('reduced motion removes every illustration animation, including after a live preference change', async ({ page }) => {
