@@ -121,7 +121,14 @@ const state = {
 
 function loadSettings() {
   try {
-    return { visibility: localStorage.getItem('hollow-square-visibility') || 'standard', mercy: localStorage.getItem('hollow-square-mercy') || '3', hints: localStorage.getItem('hollow-square-hints') === 'true', reducedMemory: localStorage.getItem('hollow-square-reduced-memory') === 'true' };
+    const visibility = localStorage.getItem('hollow-square-visibility');
+    const mercy = localStorage.getItem('hollow-square-mercy');
+    return {
+      visibility: ['standard', 'longer', 'always'].includes(visibility) ? visibility : 'standard',
+      mercy: ['3', '4'].includes(mercy) ? mercy : '3',
+      hints: localStorage.getItem('hollow-square-hints') === 'true',
+      reducedMemory: localStorage.getItem('hollow-square-reduced-memory') === 'true'
+    };
   } catch (_) {
     return { visibility: 'standard', mercy: '3', hints: false, reducedMemory: false };
   }
