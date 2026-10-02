@@ -25,13 +25,15 @@ displacement, and granulation create uneven washes beneath broken pen lines
 and fine hatching. The vignettes have transparent backgrounds: the actual page
 is their paper, with no rectangular plate or bitmap overlay. The title takes
 its green hymnal, candle, pine branches, and torn score from the earlier artwork.
-The meetinghouse uses perspective-projected wooden pews with their backs
-outside the hollow square and an open center. Local pigment pools, sparse
-woodgrain, and stronger foreground contours give the benches depth. Other
-scenes use distinct close-ups, a low floorboard view, and a leader’s lectern.
-Books have curved page edges and worn gilt bindings; foliage uses asymmetric
-needle clusters. Edit the scene geometry and shared forest-green, rust-red,
-ochre, and ink palette there. Sons of Sorrow reuses
+The meetinghouse keeps the pew backs outside the hollow square, but cants
+individual benches and dissolves much of their outline into the page. Fragmented
+marks change pressure, pigment escapes plank edges, and an asymmetric wall
+bleed replaces the tidy room grid. The central book casts a deliberately wrong
+shadow. Other scenes use book close-ups, a low floorboard view, and a leader’s
+lectern. Books have buckled leaves, crooked shape-note staffs, worn bindings,
+and interrupted ink contours. Candle wax and flame are chiefly wash shapes;
+only the wick and faint, disconnected holder marks carry ink. Edit the scene geometry and shared forest-green,
+rust-red, ochre, and ink palette there. Sons of Sorrow reuses
 the heavy-book scene. The story inventory is meetinghouse, wrong pages,
 thumbprint, empty chair, pencil note, floorboards, heavy book, three benches,
 closed leader book, wrong shadow, and place in the square. No bitmap artwork
