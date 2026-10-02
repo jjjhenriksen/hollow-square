@@ -786,6 +786,16 @@ function playPhrase() {
   }, tune.harmony ? 450 + harmonyDuration : 450 + notes.length * step);
 }
 
+function replayPhrase() {
+  if (state.phase !== 'sing' && state.phase !== 'done') return;
+  const phrase = state.activePhrase;
+  cancelRunWork();
+  state.activePhrase = phrase;
+  $('#game').classList.remove('bench-loss');
+  updateHarmonyControls();
+  playPhrase();
+}
+
 function beginLesson() {
   cancelRunWork();
   initAudio();
@@ -895,7 +905,7 @@ document.addEventListener('click', event => {
       }
       event.target.textContent = plate.hidden ? 'show the parts' : 'hide the parts';
     }
-    if (action === 'replay') { if (state.phase === 'sing' || state.phase === 'done') { state.playToken++; playPhrase(); } }
+    if (action === 'replay') replayPhrase();
     if (action === 'restart') resetCampaign();
   }
   const practice = event.target.closest('[data-practice-index]');
@@ -935,7 +945,6 @@ document.addEventListener('keydown', event => {
 });
 
 $('#settings-form').addEventListener('change', saveSettings);
-$('#replay-button').addEventListener('click', () => { if (state.phase === 'sing' || state.phase === 'done') { state.playToken++; playPhrase(); } });
 
 $('#title-art').innerHTML = window.HollowArt.title();
 buildShapeKeys(); populatePractice(); updateSettingsForm(); showScreen('title');
