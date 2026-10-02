@@ -18,6 +18,7 @@ const SHAPES = {
 const ATLAS_BASE_URL = 'https://shapenote.jacquelinehenriksen.com/atlas/';
 const OSMD_SCRIPT_URL = 'vendor/opensheetmusicdisplay.min.js';
 let osmdLoadPromise;
+let activeNotation = null;
 
 function loadOsmd() {
   if (window.opensheetmusicdisplay?.OpenSheetMusicDisplay) return Promise.resolve(true);
@@ -535,6 +536,7 @@ function renderCursedEye(group, x, y, width, height, active) {
 }
 
 function renderInkBlots(container, notes, tune, shouldShow) {
+  container.querySelectorAll('.note-blot, .note-eye').forEach(overlay => overlay.remove());
   if (state.mode !== 'campaign') return;
   const svg = container.querySelector('svg');
   if (!svg) return;
@@ -582,15 +584,39 @@ function renderInkBlots(container, notes, tune, shouldShow) {
   });
 }
 
-async function renderOsmdStaff(container, notes, tune, shouldShow, renderToken) {
-  if (!await loadOsmd()) return false;
-  const osmd = new window.opensheetmusicdisplay.OpenSheetMusicDisplay(container);
-  osmd.setOptions({ backend: 'svg', drawTitle: false, drawComposer: false, drawPartNames: true, drawMeasureNumbers: false, drawLyrics: false, drawingParameters: 'compacttight', pageFormat: 'Endless' });
-  await osmd.load(musicXmlForTune(notes, tune));
-  if (renderToken !== state.notationToken) return true;
-  osmd.render();
-  renderInkBlots(container, notes, tune, shouldShow);
-  return true;
+function notationForStaff(staff, notes, tune) {
+  const xml = musicXmlForTune(notes, tune);
+  if (activeNotation && !activeNotation.failed && activeNotation.xml === xml && activeNotation.container.isConnected) return activeNotation;
+  const container = document.createElement('div');
+  container.className = 'osmd-staff';
+  container.setAttribute('aria-hidden', 'true');
+  staff.replaceChildren(container);
+  const notation = { xml, container, osmd: null, width: 0, failed: false, ready: null };
+  activeNotation = notation;
+  // Visual updates share this promise, including while the score is still loading.
+  notation.ready = (async () => {
+    if (!await loadOsmd()) throw new Error('OSMD is unavailable');
+    const osmd = new window.opensheetmusicdisplay.OpenSheetMusicDisplay(container);
+    osmd.setOptions({ backend: 'svg', autoResize: false, drawTitle: false, drawComposer: false, drawPartNames: true, drawMeasureNumbers: false, drawLyrics: false, drawingParameters: 'compacttight', pageFormat: 'Endless' });
+    await osmd.load(xml);
+    if (activeNotation !== notation || !container.isConnected) return false;
+    osmd.render();
+    notation.osmd = osmd;
+    notation.width = staff.clientWidth;
+    return true;
+  })();
+  return notation;
+}
+
+async function renderOsmdStaff(notation, notes, tune, shouldShow, renderToken) {
+  const rendered = await notation.ready;
+  if (!rendered || activeNotation !== notation || renderToken !== state.notationToken) return;
+  const width = $('#staff').clientWidth;
+  if (width > 0 && width !== notation.width) {
+    notation.osmd.render();
+    notation.width = width;
+  }
+  renderInkBlots(notation.container, notes, tune, shouldShow);
 }
 
 function updateHarmonyControls() {
@@ -627,15 +653,19 @@ function renderStaff() {
   $('#staff').style.setProperty('--note-count', notes.length);
   const staff = $('#staff');
   const renderToken = ++state.notationToken;
-  staff.innerHTML = '<div class="osmd-staff" aria-hidden="true"></div>';
-  renderOsmdStaff(staff.querySelector('.osmd-staff'), notes, tune, shouldShow, renderToken).then(rendered => {
-    if (!rendered) throw new Error('OSMD is unavailable');
-  }).catch(error => {
-    if (renderToken !== state.notationToken) return;
+  const notation = notationForStaff(staff, notes, tune);
+  let labels = staff.querySelector('.staff-accessibility');
+  if (!labels) {
+    labels = document.createElement('span');
+    labels.className = 'staff-accessibility';
+    staff.appendChild(labels);
+  }
+  labels.innerHTML = accessibility;
+  renderOsmdStaff(notation, notes, tune, shouldShow, renderToken).catch(error => {
+    if (renderToken !== state.notationToken || activeNotation !== notation) return;
+    notation.failed = true;
     console.warn('OSMD notation fallback:', error);
-    staff.innerHTML = '<p class="quiet-note">The notation plate could not be set.</p>';
-  }).finally(() => {
-    if (renderToken === state.notationToken) staff.insertAdjacentHTML('beforeend', `<span class="staff-accessibility">${accessibility}</span>`);
+    notation.container.innerHTML = '<p class="quiet-note">The notation plate could not be set.</p>';
   });
   $('#lyric').textContent = tune.lyric;
   $('#game-page').textContent = tune.num.replace(/\s/g, '');
@@ -995,3 +1025,13 @@ $('#settings-form').addEventListener('change', saveSettings);
 $('#title-art').innerHTML = window.HollowArt.title();
 buildShapeKeys(); populatePractice(); updateSettingsForm(); updateMuteControls(); showScreen('title');
 if (state.muted) setAudioStatus('', 'muted');
+
+
+// Relayout at a new width without reparsing; refresh overlays against the new SVG.
+if (window.ResizeObserver) {
+  const staffResizeObserver = new window.ResizeObserver(() => {
+    const width = $('#staff').clientWidth;
+    if (state.screen === 'game' && activeNotation?.osmd && !activeNotation.failed && width > 0 && width !== activeNotation.width) renderStaff();
+  });
+  staffResizeObserver.observe($('#staff'));
+}
