@@ -26,7 +26,7 @@ a { color: inherit; }
 .masthead { position: fixed; z-index: 5; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 22px clamp(18px, 4vw, 60px); color: rgba(232, 222, 199, .72); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
 .wordmark { text-decoration: none; }
 .wordmark span { color: var(--paper); }
-.masthead-tools { display: flex; gap: 22px; align-items: center; }
+.masthead-tools { display: flex; gap: 12px; align-items: center; }
 .sound-note { color: rgba(232, 222, 199, .42); }
 .text-button { border: 0; padding: 8px 0; background: transparent; color: inherit; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; text-decoration: underline; text-decoration-color: rgba(167, 131, 76, .55); text-underline-offset: 5px; }
 .text-button:hover { color: var(--paper); text-decoration-color: var(--brass); }
@@ -335,7 +335,7 @@ h1 em { color: inherit; font-style: normal; }
 }
 
 @media (max-width: 700px) {
-  .masthead { width: 96vw; }
+  .masthead { width: 96vw; flex-wrap: wrap; gap: 4px; }
   .screen { width: min(960px, 96vw); padding: 24px 18px 30px; }
   .title-screen { padding-top: 34px; }
   .title-plate { min-height: 190px; }

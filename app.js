@@ -116,8 +116,13 @@ const state = {
   mode: 'campaign', screen: 'title', songIndex: 0, cursor: 0, phase: 'idle',
   mistakes: 0, totalMistakes: 0, wrongHere: 0, lost: [], playToken: 0, notationToken: 0,
   settings: loadSettings(), hideAt: 0, recallPausedAt: null, referenceUnlocked: false, harmonyUnlocked: false,
-  harmonyPreviewToken: 0, harmonyPlateToken: 0, audio: null, activePhrase: null, pendingRunTimers: new Set(), scheduledAudio: new Set()
+  harmonyPreviewToken: 0, harmonyPlateToken: 0, audio: null, muted: loadMutePreference(), activePhrase: null, pendingRunTimers: new Set(), scheduledAudio: new Set()
 };
+
+function loadMutePreference() {
+  try { return localStorage.getItem('hollow-square-muted') === 'true'; }
+  catch (_) { return false; }
+}
 
 function loadSettings() {
   try {
@@ -183,15 +188,18 @@ function scheduleRunWork(callback, delay) {
   state.pendingRunTimers.add(timer);
   return timer;
 }
+function stopScheduledAudio() {
+  state.scheduledAudio.forEach(node => {
+    try { node.stop(); } catch (_) { /* already stopped */ }
+  });
+  state.scheduledAudio.clear();
+}
 function cancelRunWork() {
   state.playToken++;
   state.harmonyPreviewToken++;
   state.pendingRunTimers.forEach(timer => window.clearTimeout(timer));
   state.pendingRunTimers.clear();
-  state.scheduledAudio.forEach(node => {
-    try { node.stop(); } catch (_) { /* already stopped */ }
-  });
-  state.scheduledAudio.clear();
+  stopScheduledAudio();
   state.activePhrase = null;
   state.recallPausedAt = null;
   const previewButton = $('#harmony-play-button');
@@ -649,12 +657,31 @@ function renderStaff() {
   updateHarmonyControls();
 }
 
+function setAudioStatus(message, stateName) {
+  const status = $('#audio-status');
+  if (!status) return;
+  status.textContent = state.muted ? 'sound muted · use the on-screen cues' : message;
+  status.dataset.state = state.muted ? 'muted' : stateName;
+}
+function updateMuteControls() {
+  document.querySelectorAll('[data-action="toggle-mute"]').forEach(button => {
+    button.textContent = state.muted ? 'Unmute sound' : 'Mute sound';
+  });
+}
+function toggleMute() {
+  state.muted = !state.muted;
+  try { localStorage.setItem('hollow-square-muted', String(state.muted)); } catch (_) { /* active for this visit */ }
+  updateMuteControls();
+  if (state.muted) {
+    stopScheduledAudio();
+    setAudioStatus('', 'muted');
+  } else initAudio();
+}
 function initAudio() {
   const status = $('#audio-status');
+  if (state.muted) { setAudioStatus('', 'muted'); return false; }
   const setStatus = (message, stateName) => {
-    if (!status) return;
-    status.textContent = message;
-    status.dataset.state = stateName;
+    setAudioStatus(message, stateName);
   };
   if (!window.AudioContext && !window.webkitAudioContext) {
     setStatus('sound unavailable · use the on-screen cues', 'unavailable');
@@ -689,7 +716,7 @@ function initAudio() {
 }
 const ORGAN_PARTIALS = [[.5, .34, 'sine'], [1, .52, 'sine'], [2, .18, 'sine'], [3, .1, 'triangle'], [4, .06, 'sine']];
 function organTone(frequency, duration, offset = 0, gain = .035) {
-  if (!state.audio || !Number.isFinite(frequency)) return;
+  if (state.muted || !state.audio || !Number.isFinite(frequency)) return;
   const now = state.audio.currentTime + offset;
   const master = state.audio.createGain();
   const attack = Math.min(.08, Math.max(.02, duration * .16));
@@ -903,6 +930,7 @@ document.addEventListener('click', event => {
   if (actionTarget) {
     const action = actionTarget.dataset.action;
     if (action === 'home') { cancelRunWork(); state.mode = 'campaign'; state.phase = 'idle'; showScreen('title'); }
+    if (action === 'toggle-mute') toggleMute();
     if (action === 'open-book') { initAudio(); resetCampaign(); }
     if (action === 'open-school') { cancelRunWork(); state.mode = 'practice'; populatePractice(); showScreen('practice'); }
     if (action === 'begin-lesson') beginLesson();
@@ -956,6 +984,7 @@ document.addEventListener('keydown', event => {
   }
   if (event.repeat) return;
   if (state.screen !== 'game') return;
+  if (event.key === ' ' && event.target.closest?.('[data-action="toggle-mute"]')) return;
   const key = event.key.toLowerCase();
   const input = { f: 'fa', s: 'sol', l: 'la', m: 'mi', ' ': 'rest' }[key];
   if (input) { event.preventDefault(); handleSing(input); }
@@ -964,4 +993,5 @@ document.addEventListener('keydown', event => {
 $('#settings-form').addEventListener('change', saveSettings);
 
 $('#title-art').innerHTML = window.HollowArt.title();
-buildShapeKeys(); populatePractice(); updateSettingsForm(); showScreen('title');
+buildShapeKeys(); populatePractice(); updateSettingsForm(); updateMuteControls(); showScreen('title');
+if (state.muted) setAudioStatus('', 'muted');
