@@ -102,9 +102,23 @@
     ) + '</g>';
   }
 
+  // The near bench is seen from behind: its back faces the reader, while its
+  // seat extends toward the open square. A front-view bench faces outward here.
+  function nearBench() {
+    const back = 'M-104-38 102-47 105-15-103-5Z';
+    return '<g transform="translate(359 376) scale(1.08)">' + layers(
+      fill('M-106-12 89-24 109-15-87-1Z', 'ochre', .35) +
+      fill('M-93-7-90 34-80 36-81-8M83-16 91 29 100 27 95-17Z', 'wood', .43) +
+      fill(back, 'pine', .39) + bloom(-25, -26, 62, 9, 'pine', .13, 'near-bench-grain'),
+      pen('M-106-12 89-24 109-15-87-1Z M-93-7l3 41 10 2-1-44M83-16l8 45 9-2-5-44', 1.85, .94) +
+      pen(back, 1.75, .94) +
+      pen('M-99-33 97-42M-99-12 99-22M-98-27l65-3m8-1 48-2m11-1 54-3M-91-33l1 16m4-15 1 13m4-12 1 9M90-41l1 14m4-14 1 10M-88 7l2 21M95-1l3 21', .65, .66, 'wood')
+    ) + '</g>';
+  }
+
   function square(missing = false) {
     return bench(358, 253, .61) + sideBench() + sideBench(true) +
-      (missing ? pen('M290 368q70-10 140 0', .8, .23, 'wood') : bench(359, 365, 1.08)) +
+      (missing ? pen('M290 368q70-10 140 0', .8, .23, 'wood') : nearBench()) +
       pen('M319 288 401 287 434 333 286 335Z', .6, .26, 'ochre');
   }
 
