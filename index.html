@@ -7,7 +7,7 @@
   <meta name="description" content="A browser-playable Sacred Harp horror game about song, memory, and the class that remains.">
   <title>Hollow Square — a Sacred Harp horror game</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
   <div class="ambient ambient-left" aria-hidden="true"></div>
@@ -17,6 +17,7 @@
     <a class="wordmark" href="#title" data-action="home">the fleet / <span>hollow square</span></a>
     <div class="masthead-tools">
       <span class="sound-note">headphones recommended</span>
+      <button class="text-button" type="button" data-action="toggle-mute">Mute sound</button>
       <button class="text-button" type="button" data-action="open-settings">assistance</button>
     </div>
   </header>
@@ -45,6 +46,7 @@
               <button class="choice" type="button" data-action="open-book"><span class="choice-label">Open the Book</span></button>
             </div>
             <div class="keys-hint smallcaps">headphones recommended &nbsp;·&nbsp; keys: F · S · L · M</div>
+            <button class="text-button" type="button" data-action="toggle-mute">Mute sound</button>
             <div class="warn">If you hear singing through the pines, you are already expected.</div>
           </div>
           <div class="title-plate" id="title-art"></div>
@@ -176,6 +178,6 @@
 
   <script src="harmony-data.js?v=4"></script>
   <script src="artwork.js?v=1"></script>
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>
