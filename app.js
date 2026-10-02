@@ -115,7 +115,7 @@ const TUNES = [
 const state = {
   mode: 'campaign', screen: 'title', songIndex: 0, cursor: 0, phase: 'idle',
   mistakes: 0, totalMistakes: 0, wrongHere: 0, lost: [], playToken: 0, notationToken: 0,
-  settings: loadSettings(), hideAt: 0, referenceUnlocked: false, harmonyUnlocked: false,
+  settings: loadSettings(), hideAt: 0, recallPausedAt: null, referenceUnlocked: false, harmonyUnlocked: false,
   harmonyPreviewToken: 0, harmonyPlateToken: 0, audio: null, activePhrase: null, pendingRunTimers: new Set(), scheduledAudio: new Set()
 };
 
@@ -193,6 +193,7 @@ function cancelRunWork() {
   });
   state.scheduledAudio.clear();
   state.activePhrase = null;
+  state.recallPausedAt = null;
   const previewButton = $('#harmony-play-button');
   if (previewButton) previewButton.disabled = false;
 }
@@ -291,6 +292,7 @@ function openDrawer(id) {
   if (invoker && invoker !== document.body) dialogInvokers.set(id, invoker);
   $(id).hidden = false;
   activeDialog = id;
+  if (state.phase === 'sing' && state.recallPausedAt === null) state.recallPausedAt = Date.now();
   setPageModalState(true);
   const close = $(id).querySelector('.close-button');
   if (close) close.focus();
@@ -299,7 +301,19 @@ function closeDrawer(id) {
   const dialog = $(id);
   if (!dialog || dialog.hidden) return;
   dialog.hidden = true;
-  if (activeDialog === id) activeDialog = null;
+  if (activeDialog === id) {
+    activeDialog = null;
+    if (state.recallPausedAt !== null) {
+      if (state.phase === 'sing') {
+        state.hideAt += Math.max(0, Date.now() - state.recallPausedAt);
+        state.recallPausedAt = null;
+        renderStaff();
+        if (state.mode === 'campaign' && state.settings.visibility !== 'always' && Number.isFinite(state.hideAt)) {
+          scheduleRunWork(() => { if (state.phase === 'sing') renderStaff(); }, Math.max(0, state.hideAt - Date.now()) + 40);
+        }
+      } else state.recallPausedAt = null;
+    }
+  }
   setPageModalState(false);
   const invoker = dialogInvokers.get(id);
   dialogInvokers.delete(id);
@@ -594,7 +608,8 @@ function updateHarmonyControls() {
 function renderStaff() {
   const tune = currentTune();
   const notes = notesFor(tune);
-  const shouldShow = state.mode === 'practice' || state.settings.visibility === 'always' || Date.now() < state.hideAt || state.phase !== 'sing';
+  const recallTime = state.recallPausedAt ?? Date.now();
+  const shouldShow = state.mode === 'practice' || state.settings.visibility === 'always' || recallTime < state.hideAt || state.phase !== 'sing';
   const accessibility = notes.map((note, index) => {
     const syllable = note.silent ? 'rest' : noteSyllable(note);
     const hidden = state.mode === 'campaign' && tune.smudge.includes(index) && !note.revealed && !shouldShow;
@@ -777,6 +792,8 @@ function playPhrase() {
     state.phase = 'sing'; state.cursor = firstSungIndex(notes); state.wrongHere = 0;
     const visibilityWindow = state.settings.visibility === 'longer' ? 5000 : 900;
     state.hideAt = state.mode === 'practice' ? Infinity : Date.now() + visibilityWindow;
+    // Listening can finish while a modal is open; the recall window starts when the player returns.
+    state.recallPausedAt = activeDialog ? Date.now() : null;
     setKeysEnabled(true);
     setPrompt(state.mode === 'practice' ? 'Your turn. Name each shape; a correction is just another repetition.' : 'Your turn. The ink will not wait.');
     renderStaff();
