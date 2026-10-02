@@ -1,0 +1,18 @@
+Caveat, weight 500, supplied by the official Google Fonts CSS service.
+
+Original font project: https://github.com/googlefonts/caveat
+Google Fonts repository: https://github.com/google/fonts/tree/main/ofl/caveat
+License: Caveat-OFL.txt (SIL Open Font License 1.1)
+
+Bundled file: Caveat-notes.woff2
+Downloaded 2026-10-02 from fonts.gstatic.com through the Google Fonts CSS API.
+The service subset includes every character in the six handwritten notes in
+marginalia.js. It is served locally by marginalia.css with no runtime request
+to Google. If those notes gain new characters, refresh this subset or bundle
+the full Latin font.
+
+CSS request:
+https://fonts.googleapis.com/css2?family=Caveat%3Awght%40500&display=swap&text=+.%3FCKLNSWabcdefghilmnoprstuvwy
+
+Font source:
+https://fonts.gstatic.com/l/font?kit=WnznHAc5bAfYB2QRah7pcpNvOx-pjcB9SIejYBxOgguVrNYCUKti03pwor925in4GzPILM6SW73Y2x02PZs55A&skey=7833cd5b856b60c9&v=v23

@@ -401,7 +401,7 @@
       pen('M-5-61q-1 7 3 10m1 18-2 6M6-49q-3 11 0 17', .4, .2, 'ochre') +
       pen('M0-75l1-9', .82, .78) +
       pen('M-30 4q12-5 20-4m22 0 17 4M-20 13l14 1m13 0 12-1', .6, .27, 'wood') +
-      pen('M-10 14q9 2 20 0', .85, .37) +
+      pen('M-9 14q8 2 17 0', 1, .49) +
       pen('M-31 5q-15-4-19 3m2 8q7 5 15 1M-34 8q-7-1-10 2', .6, .29, 'wood')
     ) + flameOrSmoke + '</g>';
   }
@@ -459,6 +459,22 @@
     ) + '</g>';
   }
 
+  function pencil(x, y, length = 234, angle = -42) {
+    // An opaque lacquered barrel occludes the printed page; the tiny offset
+    // shadow separates it without giving the whole illustration a hard edge.
+    return `<g transform="translate(${x} ${y}) rotate(${angle})">` +
+      fill(`M4 5L27-3 ${length-7}-3 ${length+2} 5 ${length-5} 13 25 12Z`, 'ink', .2) +
+      fill(`M23-7 ${length-8}-7 ${length}-1 ${length} 5 23 8 0 1Z`, 'paper') +
+      fill(`M24-7 ${length-8}-7 ${length}-1 ${length} 5 24 8Z`, 'rust') +
+      fill(`M25-6 ${length-8}-6 ${length-3}-2 26-2Z`, 'ochre', .72) +
+      fill(`M26 3 ${length} 1 ${length} 5 24 8Z`, 'ink', .3) +
+      fill('M0 1 24-7 26-2 23 8Z', 'light') +
+      fill('M0 1 10-3 11 4Z', 'ink') +
+      pen(`M11-3 24-7 ${length-8}-7 ${length}-1v6L24 8 11 4M25-6l1 11`, .85, .79) +
+      pen(`M33-2 ${length-15}-2`, .45, .55, 'light') +
+      pen(`M${length-10}-6l2 10m3-9 1 8`, .6, .6) + '</g>';
+  }
+
   const scenes = {
     title() {
       return table('title') + candle(205, 290, 1.68) + closedBook(409, 312, 1.36, -8) +
@@ -466,7 +482,12 @@
         pine(238, 384, .76, -135) + cone(366, 408, .88);
     },
     meetinghouse() {
-      return room() + ground('meeting') + square() + layers(fill('M328 318Q294 303 269 290L244 271 232 281 218 271 225 293Q265 332 315 330Z', 'ink', .61), pen('M317 326q-47-9-76-26m-8-8-7-4', 2.3, .78)) + closedBook(335, 302, .46, -14) + candle(412, 297, .51);
+      return room() + ground('meeting') + pew('far') + pew('left') + pew('right') +
+        layers(bloom(355, 282, 57, 9, 'wood', .17, 'book-floor-contact') +
+          fill('M299 275 326 287 413 263 420 269 331 294 297 282Z', 'ink', .23),
+          pen('M310 302q23-7 42-5m22-3 23-3M344 315l27-3', .65, .35, 'wood')) +
+        `<g transform="translate(354 256) rotate(-9) scale(.4)">${layers(fill('M-88 62-68 65-23 57-21 62-67 71-84 68Z', 'ink', .6), pen('M-82 67q15 5 38-2', 2.5, .5, 'wood'))}</g>` +
+        closedBook(354, 256, .4, -9) + candle(425, 296, .51) + pew('near');
     },
     wrongPages() {
       return layers(
@@ -491,15 +512,13 @@
         layers(fill('M247 335Q302 350 477 409L429 425 228 374Z', 'indigo', .14) +
           bloom(265, 394, 111, 15, 'wood', .11, 'chair-contact'), '') +
         chair(282, 321, 1.39) +
-        layers(fill('M304 196Q318 187 329 199L340 260 332 271 324 264 316 278 307 269Z', 'rust', .47),
-          pen('M304 196q14-9 25 3l11 61m-31-58 10 60m-4-58 11 59m-4-61 12 56M307 269l9 9 8-14 8 7 8-11', .7, .69, 'rust')) +
+        layers(fill('M293 181Q303 171 316 177Q325 184 324 196L338 258 329 269 321 264 313 275 305 267 303 223Z', 'rust', .6),
+          pen('M295 181q10-7 21-4m7 10 1 9 14 62M303 185q10 15 7 31l9 45m-5-64q2 14 0 26l13 40M305 267l8 8 8-11 8 5 9-11', .7, .71, 'rust') + pen('M315 204q-3 17 0 34l7 24', 1.2, .35)) +
         candle(499, 353, .94);
     },
     pencilNote() {
       return table('pencil') + book(344, 147, 1.66, 5) +
-        layers(fill('M398 332 560 181 568 191 406 342 384 351Z', 'ochre', .53),
-          pen('M398 332 560 181 568 191 406 342 384 351Z M398 332l8 10M552 189l8 9M560 181l7-6 8 9-7 7', 1.0, .86) +
-          pen('M403 333 561 189M385 350l8-5M410 334l143-137', .55, .66, 'wood')) +
+        pencil(386, 365, 236, -42) +
         pen('M189 308q7-13 10-1t9-5q7-7 6 3t12-3m-40 18q16-5 44 1M194 342q10-4 36 0', .75, .74, 'wood') +
         scrap(564, 379, .56, 18, 3);
     },
@@ -513,9 +532,9 @@
       return layers(fill('M110 244Q357 229 606 246L642 414 83 424Z', 'wood', .11) +
         bloom(425, 292, 172, 33, 'indigo', .11, 'below-bench'), '') +
         `<g transform="translate(-126 -247) scale(1.35)">${pew('near')}</g>` +
-        layers(fill('M207 337Q353 314 502 331L514 341Q362 326 202 349Z', 'ink', .5) +
+        layers(fill('M207 337 246 329 277 333 300 327 327 331 346 326 373 330 411 327 437 332 478 330 502 336 509 341 473 338 441 343 410 337 374 339 347 335 325 339 300 334 279 339 243 335 202 349Z', 'ink', .67) +
           bloom(359, 339, 127, 14, 'pine', .16, 'floor-voice'),
-          grain + pen('M204 337q132-23 298-6M202 350q157-26 312-9M143 392l71-6m269-2 82-6', .8, .61) +
+          grain + pen('M205 333l41-8 31 4m11-1 14-5 27 4m43 1 37-4 24 5M211 347l31-10 40 5m47-2 18-4 26 4m68 1 31-4M143 392l71-6m269-2 82-6', .8, .57) + pen('M210 334l-7 10m37-16 6 7m40-5 4 7M480 331l18 3 11 7', 1.5,.68) +
           pen('M437 385q19-15 44-5q-15 6-39 9m4-3 24-3', .55, .56, 'wood')) +
         candle(161, 369, .94) + scrap(551, 379, .65, 13, 1);
     },
@@ -532,7 +551,7 @@
     closedBook() {
       return `<g opacity=".43" transform="translate(20 -13) scale(.9)">${room(true)}${pew('far')}${pew('left')}</g>` +
         layers(bloom(437, 410, 125, 15, 'indigo', .13, 'lectern-contact'), '') +
-        lectern(425, 302, 1.13) + candle(520, 213, .45) + closedBook(424, 205, .77, -8);
+        lectern(425, 302, 1.13) + layers(fill('M317 215 369 245 539 201 536 211 371 253 315 223Z', 'ink', .18), pen('M345 240l27 17 92-24m14-3 43-12', 1.3,.67,'wood')) + candle(520, 213, .45) + closedBook(424, 188, .77, -8);
     },
     wrongShadow() {
       const shadow = 'M370 282Q400 250 395 225L383 212 383 197 369 195Q366 189 378 180L379 160Q386 117 428 126Q463 132 458 169L453 202Q482 225 518 239L548 319Z';

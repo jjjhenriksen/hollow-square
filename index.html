@@ -8,6 +8,7 @@
   <title>Hollow Square — a Sacred Harp horror game</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="marginalia.css?v=1">
 </head>
 <body>
   <div class="ambient ambient-left" aria-hidden="true"></div>
@@ -60,6 +61,7 @@
         <h2 id="story-heading">The class is waiting.</h2>
         <figure class="story-illustration" id="story-illustration" aria-label="An ink illustration from the songbook">
         </figure>
+        <div id="story-margin-note"></div>
         <div class="story-text" id="story-text"></div>
         <div class="story-actions">
           <button class="button button-primary" type="button" data-action="begin-lesson">Take your place</button>
@@ -77,6 +79,7 @@
         <button class="text-button" type="button" data-action="home">close the book</button>
       </div>
       <p class="section-lede">Learn the four patent shapes, hear short tenor openings, and repeat a phrase until the eye and ear agree. Nothing in this room follows you into the book.</p>
+      <div id="practice-margin-note"></div>
       <div class="shape-reference" aria-label="Four-shape notation reference">
         <div class="shape-card"><span class="shape-mark fa" aria-hidden="true"></span><strong>fa</strong><small>degrees 1 &amp; 4</small></div>
         <div class="shape-card"><span class="shape-mark sol" aria-hidden="true"></span><strong>sol</strong><small>degrees 2 &amp; 5</small></div>
@@ -177,7 +180,8 @@
   </aside>
 
   <script src="harmony-data.js?v=4"></script>
-  <script src="artwork.js?v=5"></script>
-  <script src="app.js?v=8"></script>
+  <script src="artwork.js?v=6"></script>
+  <script src="marginalia.js?v=1"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
