@@ -44,6 +44,10 @@ is loaded. To inspect the static payload locally, run:
 du -h vendor/opensheetmusicdisplay.min.js artwork.js | sort -h
 ```
 
+The wrong-shadow scene uses an elongated, translucent cast silhouette with
+soft bleeding edges and a lower body that dissolves into the tabletop wash.
+Its face and shoulders have no traced outline or hard portrait cutoff.
+
 Candle flames and their light move gently; the flameless candle releases a
 small drifting wisp, and the wrong shadow slowly deepens. These CSS animations
 change only transform or opacity, pause when their screen is hidden, and stay

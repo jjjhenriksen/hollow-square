@@ -554,17 +554,32 @@
         lectern(425, 302, 1.13) + layers(fill('M317 215 369 245 539 201 536 211 371 253 315 223Z', 'ink', .18), pen('M345 240l27 17 92-24m14-3 43-12', 1.3,.67,'wood')) + candle(520, 213, .45) + closedBook(424, 188, .77, -8);
     },
     wrongShadow() {
-      const shadow = 'M370 282Q400 250 395 225L383 212 383 197 369 195Q366 189 378 180L379 160Q386 117 428 126Q463 132 458 169L453 202Q482 225 518 239L548 319Z';
-      let scratches = '';
-      for (let i = 0; i < 19; i++) scratches += pen(`M${410 + i * 5} ${211 + i * 2}l-9 29m5-15-7 23`, .55, .2, 'paper');
-      return layers(fill('M218 134Q428 104 569 147L598 329 280 330Z', 'ochre', .08),
-        pen('M225 174l69-6m177-8 70 7M239 211l48-4m186 4 59 4M258 258l81-3m157 11 45 5', .55, .33, 'wood')) +
-        `<defs><clipPath id="@texture-shadow"><path d="${shadow}"/></clipPath></defs>` +
-        `<g class="art-shadow">${layers(fill(shadow, 'ink', .57) +
-          `<g clip-path="url(#@texture-shadow)">${bloom(441, 254, 85, 57, 'indigo', .24, 'shadow-edge')}</g>`,
-          pen('M378 180l-9 12 14 5v15l12 13M453 202q34 28 65 37', .75, .47) +
-          `<g clip-path="url(#@texture-shadow)">${scratches}</g>`)}</g>` +
-        table('shadow', true) + candle(213, 325, 1.57, false) + closedBook(435, 352, 1.21, -9);
+      // A stretched cast shadow, with lost shoulders and a tail in the tabletop
+      // wash. It is a trace of an absent singer, rather than a cut-out portrait.
+      const shadow = 'M292 363Q348 326 359 280Q366 253 393 238L388 221 375 215Q370 211 384 202L390 188Q388 151 418 133Q445 123 461 148Q478 170 464 203L459 222Q484 239 492 269Q505 305 487 331L531 372Q416 397 292 363Z';
+      return layers(
+        bloom(411, 224, 146, 111, 'wood', .04, 'shadow-wall') +
+        bloom(326, 275, 78, 69, 'indigo', .04, 'shadow-wall-cool'),
+        pen('M294 167q28-8 56-7m131 28 42 8M290 246l38-3m149 9 31 5', .5, .22, 'wood')) +
+        `<defs>
+          <clipPath id="@texture-shadow"><path d="${shadow}"/></clipPath>
+          <linearGradient id="@texture-shadow-pigment" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="${COLOR.indigo}" stop-opacity=".08"/>
+            <stop offset=".26" stop-color="${COLOR.ink}" stop-opacity=".38"/>
+            <stop offset=".56" stop-color="${COLOR.ink}" stop-opacity=".26"/>
+            <stop offset="1" stop-color="${COLOR.indigo}" stop-opacity="0"/>
+          </linearGradient>
+          <filter id="@texture-shadow-soft" x="-12%" y="-10%" width="124%" height="120%"><feGaussianBlur stdDeviation="1.6"/></filter>
+        </defs>` +
+        `<g class="art-shadow">` +
+          `<path d="${shadow}" fill="url(#@texture-shadow-pigment)" filter="url(#@texture-shadow-soft)"/>` +
+          layers(
+            `<g clip-path="url(#@texture-shadow)">` +
+              bloom(455, 258, 24, 53, 'indigo', .13, 'shadow-shoulder-pool') +
+              bloom(388, 296, 29, 61, 'ink', .085, 'shadow-body-pool') + '</g>' +
+            bloom(452, 260, 51, 47, 'indigo', .04, 'shadow-escaped-edge') +
+            fill('M348 337Q383 306 417 297L438 315Q390 337 326 359Z', 'indigo', .1), '') +
+        '</g>' + table('shadow', true) + candle(213, 325, 1.57, false) + closedBook(435, 352, 1.21, -9);
     },
     placeInSquare() {
       return `<g opacity=".68">${room(true)}</g>` + ground('last') + square() +
