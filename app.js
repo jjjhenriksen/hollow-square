@@ -245,6 +245,7 @@ function showStory(index) {
   const illustration = $('#story-illustration');
   illustration.setAttribute('aria-label', tune.illustrationAlt);
   illustration.innerHTML = window.HollowArt.story(tune.artScene, tune.illustrationAlt);
+  $('#story-margin-note').innerHTML = window.HollowMarginalia.story(tune.artScene);
   $('#story-reference-button').hidden = index === 0;
   $('#story-text').innerHTML = storyFor(index);
   showScreen('story');
@@ -257,6 +258,7 @@ function setPrompt(message, isError = false) {
 }
 
 function populatePractice() {
+  $('#practice-margin-note').innerHTML = window.HollowMarginalia.practice();
   const list = $('#practice-list');
   list.innerHTML = TUNES.map((tune, index) => `<button class="practice-card" type="button" data-practice-index="${index}"><span class="practice-name">${tune.num} · ${tune.name}</span><span class="practice-meta">${tune.mode} · ${tune.meter || 'anthem'}<br>hear and repeat</span></button>`).join('');
 }

@@ -1,0 +1,56 @@
+/* Caveat is bundled locally under the SIL Open Font License; see assets/fonts. */
+@font-face {
+  font-family: 'Caveat';
+  src: url('assets/fonts/Caveat-notes.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+#story-margin-note:empty,
+#practice-margin-note:empty { display: none; }
+
+#story-margin-note { margin: 0 0 24px; }
+#practice-margin-note { width: min(680px, 100%); margin: 0 auto 24px; }
+
+.margin-note {
+  position: relative;
+  width: fit-content;
+  max-width: min(17rem, 100%);
+  margin: 0 0 0 auto;
+  padding: 0 0 6px 34px;
+  color: var(--ink, #21170f);
+  font: 500 22px/1.2 'Caveat', 'Bradley Hand', cursive;
+  letter-spacing: .015em;
+  text-align: left;
+  text-shadow: none;
+  transform: rotate(-1.4deg);
+  transform-origin: left center;
+  overflow-wrap: break-word;
+}
+.margin-note p { margin: 0; }
+.margin-note-arrow {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  width: 28px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .7;
+}
+.margin-note--practice { max-width: min(19rem, 100%); transform: rotate(.9deg); }
+
+/* Offset the writing into the page's spare margin while keeping its height in
+   document flow. Narrow pages keep the entire note within their text measure. */
+@media (min-width: 1000px) {
+  #story-margin-note .margin-note { margin-right: -28px; }
+  #practice-margin-note .margin-note { margin-right: -18px; }
+}
+@media (max-width: 600px) {
+  .margin-note { margin-left: 12px; margin-right: 6px; max-width: calc(100% - 18px); transform: none; }
+  .margin-note--practice { max-width: calc(100% - 18px); }
+}

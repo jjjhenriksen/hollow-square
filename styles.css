@@ -426,7 +426,7 @@ h1 em { color: inherit; font-style: normal; }
 .story-screen, .practice-screen, .game-screen { background-image: repeating-linear-gradient(9deg, rgba(63, 43, 20, .026) 0 1px, transparent 1px 7px), repeating-linear-gradient(101deg, transparent 0 13px, rgba(255, 239, 195, .07) 13px 14px, transparent 14px 27px), radial-gradient(ellipse 120% 90% at 50% 30%, #ddc18a 0%, #c49b5e 85%, #9f7542 100%); }
 .eyebrow, .book-margin, .reference-tune { color: var(--forest); }
 .story-text em, .game-feedback, .end-mark { color: var(--oxblood); }
-.story-illustration { border: 2px solid var(--ink); background: #d8c397; box-shadow: 7px 7px 0 rgba(33, 23, 15, .18), inset 0 0 0 1px rgba(255, 243, 207, .24); }
+.story-illustration { border: 0; background: transparent; box-shadow: none; }
 .story-illustration img { filter: saturate(1.1) contrast(1.06); }
 .story-screen h2, .practice-screen h2, .game-screen h2, .end-screen h2, .drawer-heading h2 { color: var(--forest); }
 .button, .choice, .practice-card, .shape-key, .button-quiet { border-color: var(--ink); color: var(--ink); }
@@ -445,9 +445,8 @@ h1 em { color: inherit; font-style: normal; }
 [hidden] { display: none !important; }
 :focus-visible { outline-color: #783a32; }
 
-/* Programmatic story art shares the ink-and-paper palette and scales without
-   loading bitmap assets. */
-.programmatic-art { display: block; width: 100%; height: auto; color: #38291b; }
+/* Transparent watercolor vignettes let the actual page serve as their paper. */
+.programmatic-art { display: block; width: 100%; height: auto; background: transparent; }
 .title-plate .programmatic-art { max-height: 330px; }
 .story-illustration .programmatic-art { width: 100%; }
 .harmony-engraving-mount { min-width: 720px; }
@@ -522,4 +521,40 @@ h1 em { color: inherit; font-style: normal; }
   .harmony-tools { align-items: flex-start; }
   .harmony-status { flex-basis: 100%; }
   .harmony-scroll-note { display: block; }
+}
+
+/* Small living details, with still artwork as the reduced-motion default.
+   Paint filters stay static; only the isolated flame, light, and shadow move. */
+@media (prefers-reduced-motion: no-preference) {
+  .programmatic-art .art-flame {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: art-candle-flicker 2.8s ease-in-out infinite;
+  }
+  .programmatic-art .art-glow { animation: art-candle-glow 4.6s ease-in-out infinite; }
+  .programmatic-art .art-smoke { animation: art-smoke-drift 6s ease-in-out infinite; }
+  .programmatic-art .art-shadow { animation: art-shadow-breathe 9s ease-in-out infinite; }
+}
+.screen[hidden] .programmatic-art .art-flame,
+.screen[hidden] .programmatic-art .art-glow,
+.screen[hidden] .programmatic-art .art-smoke,
+.screen[hidden] .programmatic-art .art-shadow { animation-play-state: paused; }
+
+@keyframes art-candle-flicker {
+  0%, 100% { transform: rotate(-2deg) scale(.97, 1); opacity: .88; }
+  34% { transform: rotate(2deg) scale(1.02, .96); opacity: 1; }
+  67% { transform: rotate(-1deg) scale(.98, 1.04); opacity: .93; }
+}
+@keyframes art-candle-glow {
+  0%, 100% { opacity: .64; }
+  45% { opacity: 1; }
+  76% { opacity: .8; }
+}
+@keyframes art-smoke-drift {
+  0%, 100% { transform: translate(0, 1px); opacity: .48; }
+  50% { transform: translate(3px, -3px); opacity: .85; }
+}
+@keyframes art-shadow-breathe {
+  0%, 100% { opacity: .78; }
+  50% { opacity: 1; }
 }
