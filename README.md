@@ -59,7 +59,8 @@ there are no animation timers or frame loops to clean up.
 A few story pages carry a reader's handwritten note, recording uneasy observations
 and brief traces of an earlier reader. Singing School carries a small weather note.
 The notes in `marginalia.js` are ordinary accessible text; they do not replace
-printed instructions or introduce controls. `marginalia.css` reserves space in
+printed instructions. They brighten on hover, keyboard focus, or touch, and
+occupy different positions around each leaf. `marginalia.css` reserves space in
 the page flow and keeps them inline on narrow screens. La Belle Aurore is bundled as a
 local TrueType font with its SIL Open Font License and source provenance in
 `assets/fonts`; no font service is contacted while playing.

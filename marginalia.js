@@ -3,6 +3,7 @@
 (() => {
   // These annotations are a reader's pencil voice, not additional controls.
   // The lookup never includes caller-provided content in the returned markup.
+  const placements = Object.freeze({ meetinghouse: 'upper-left', emptyChair: 'middle-right', pencilNote: 'lower-left', threeBenches: 'upper-right', placeInSquare: 'foot-left' });
   const notes = Object.freeze({
     meetinghouse: 'They knew my name.',
     pencilNote: 'I don’t remember writing this.',
@@ -11,16 +12,16 @@
     placeInSquare: 'Leave a little room.'
   });
 
-  function note(text, kind) {
-    return `<aside class="margin-note margin-note--${kind}" aria-label="Handwritten margin note"><p>${text}</p></aside>`;
+  function note(text, kind, placement) {
+    return `<aside class="margin-note margin-note--${kind} margin-note--${placement}" tabindex="0" aria-label="Handwritten margin note"><p>${text}</p></aside>`;
   }
 
   window.HollowMarginalia = Object.freeze({
     story(scene) {
-      return Object.hasOwn(notes, scene) ? note(notes[scene], 'story') : '';
+      return Object.hasOwn(notes, scene) ? note(notes[scene], 'story', placements[scene]) : '';
     },
     practice() {
-      return note('Rain all morning.', 'practice');
+      return note('Rain all morning.', 'practice', 'foot-right');
     }
   });
 })();

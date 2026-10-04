@@ -10,8 +10,9 @@
 #story-margin-note:empty,
 #practice-margin-note:empty { display: none; }
 
-#story-margin-note { position: relative; margin: -12px 0 18px; }
-#practice-margin-note { position: relative; width: min(680px, 100%); margin: -8px auto 18px; }
+#story-margin-note { margin: 12px 0 18px; }
+#practice-margin-note { width: min(760px, 100%); margin: 16px auto 20px; }
+.story-wrap { position: relative; }
 
 .margin-note {
   width: 8rem;
@@ -19,6 +20,8 @@
   margin: 0 0 0 auto;
   padding: 0;
   color: #514535;
+  opacity: .3;
+  transition: opacity 180ms ease;
   font: 400 15px/1.45 'La Belle Aurore', 'Bradley Hand', cursive;
   letter-spacing: 0;
   text-align: left;
@@ -27,29 +30,35 @@
   overflow-wrap: break-word;
 }
 .margin-note p { margin: 0; }
+.margin-note:hover, .margin-note:focus, .margin-note:active { opacity: 1; }
+.margin-note:focus-visible { outline: 1px dotted #514535; outline-offset: 4px; }
+.margin-note--upper-left, .margin-note--lower-left, .margin-note--foot-left { margin-left: 4px; margin-right: auto; }
+.margin-note--middle-right { transform: rotate(3deg); }
+.margin-note--lower-left { transform: rotate(-5deg); }
+.margin-note--upper-right { transform: rotate(2deg); }
+.margin-note--foot-left { transform: rotate(-1deg); }
 .margin-note--practice { transform: rotate(2deg); }
 
-/* Wide leaves have a true outer margin. Writing sits alongside the prose,
-   without interrupting its measure or creating a caption below the drawing. */
+/* Each leaf keeps its inscription in a different part of the outer margin. */
 @media (min-width: 1000px) {
-  #story-margin-note { height: 0; margin: 0; }
-  #story-margin-note .margin-note {
-    position: absolute;
-    left: calc(100% + 16px);
-    top: 8px;
-    width: 90px;
-  }
-  #practice-margin-note { height: 0; margin: 0 auto; }
-  #practice-margin-note .margin-note {
-    position: absolute;
-    left: calc(100% + 14px);
-    top: -40px;
-    width: 76px;
-  }
+  #story-margin-note { margin: 0; }
+  #story-margin-note .margin-note { position: absolute; width: 90px; margin: 0; }
+  #story-margin-note .margin-note--upper-left { left: -106px; top: 18%; }
+  #story-margin-note .margin-note--middle-right { right: -106px; top: 48%; }
+  #story-margin-note .margin-note--lower-left { left: -106px; top: 68%; }
+  #story-margin-note .margin-note--upper-right { right: -106px; top: 12%; }
+  #story-margin-note .margin-note--foot-left { left: -106px; bottom: 4%; }
 }
 
-/* On narrow leaves the small inscription uses the spare right-hand space
-   below the illustration. It stays in flow and never covers the story. */
+/* Small leaves retain different anchors, without covering art or printed text. */
 @media (max-width: 600px) {
   .margin-note { font-size: 14px; width: 7.5rem; margin-right: 4px; }
+  .margin-note--upper-left, .margin-note--lower-left, .margin-note--foot-left { margin-right: auto; }
+}
+@media (hover: none) {
+  .margin-note { opacity: .55; }
+  .margin-note:focus, .margin-note:active { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .margin-note { transition: none !important; }
 }

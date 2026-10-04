@@ -245,7 +245,13 @@ function showStory(index) {
   const illustration = $('#story-illustration');
   illustration.setAttribute('aria-label', tune.illustrationAlt);
   illustration.innerHTML = window.HollowArt.story(tune.artScene, tune.illustrationAlt);
-  $('#story-margin-note').innerHTML = window.HollowMarginalia.story(tune.artScene);
+  const margin = $('#story-margin-note');
+  margin.innerHTML = window.HollowMarginalia.story(tune.artScene);
+  // Keep narrow leaves in flow; wide leaves place this writing in outer margins.
+  if (tune.artScene === 'meetinghouse') illustration.before(margin);
+  else if (tune.artScene === 'threeBenches') $('#story-heading').before(margin);
+  else if (tune.artScene === 'placeInSquare') $('#story-text').after(margin);
+  else illustration.after(margin);
   $('#story-reference-button').hidden = index === 0;
   $('#story-text').innerHTML = storyFor(index);
   showScreen('story');

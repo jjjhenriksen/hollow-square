@@ -84,3 +84,46 @@ test('margin writing stays readable and within 320px pages', async ({ page }) =>
   await page.getByRole('button', { name: 'Attend Singing School' }).click();
   await fit('#practice-margin-note .margin-note');
 });
+
+test('faint handwriting strengthens on hover and focus without moving', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 1000 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open the Book' }).click();
+  const note = page.locator('#story-margin-note .margin-note');
+  const initial = await note.boundingBox();
+  await expect(note).toHaveCSS('opacity', '0.3');
+  await note.hover();
+  await expect(note).toHaveCSS('opacity', '1');
+  expect(await note.boundingBox()).toEqual(initial);
+  await page.mouse.move(0, 0);
+  await expect(note).toHaveCSS('opacity', '0.3');
+  await note.focus();
+  await expect(note).toHaveCSS('opacity', '1');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(note).toHaveCSS('transition-duration', '0s');
+});
+
+test('notes occupy distinct margins and stay clear of text and artwork on every annotated leaf', async ({ page }) => {
+  await page.goto('/');
+  const locations = [];
+  for (const width of [1280, 1000, 768, 375, 320]) {
+    await page.setViewportSize({ width, height: 1100 });
+    for (const index of [0, 3, 4, 7, 11]) {
+      await page.evaluate(index => showStory(index), index);
+      const placement = await page.locator('#story-margin-note .margin-note').evaluate(note => {
+        const r = note.getBoundingClientRect();
+        const overlaps = id => {
+          const other = (id === 'story-actions' ? document.querySelector('.story-actions') : document.getElementById(id)).getBoundingClientRect();
+          return r.left < other.right && r.right > other.left && r.top < other.bottom && r.bottom > other.top;
+        };
+        return { x: r.x, y: r.y, right: r.right, bottom: r.bottom, width: innerWidth, overflow: document.documentElement.scrollWidth, overlaps: ['story-text', 'story-illustration', 'story-heading', 'story-actions'].some(overlaps) };
+      });
+      expect(placement.x).toBeGreaterThanOrEqual(0);
+      expect(placement.right).toBeLessThanOrEqual(placement.width);
+      expect(placement.overflow).toBeLessThanOrEqual(width);
+      expect(placement.overlaps).toBe(false);
+      if (width === 1280) locations.push([Math.round(placement.x), Math.round(placement.y)].join(','));
+    }
+  }
+  expect(new Set(locations).size).toBe(5);
+});
