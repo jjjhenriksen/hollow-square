@@ -227,7 +227,7 @@ function showScreen(name) {
 }
 
 function storyFor(index) {
-  if (index === 0) return '<p>You have never been to a singing. Alone, you have imagined a class around you: other voices joining yours, a place among them.</p><p>The meetinghouse stands where the road gives up. Four benches face inward, leaving a hollow square in the middle. The class has been singing since before you arrived.</p><p>The chairman places an old book in your hands. <em>“We sing the notes before the words,”</em> he says. Then the class begins.</p>';
+  if (index === 0) return '<p>You have never been to a singing. Still, you know where your chair should be.</p><p>The meetinghouse stands where the road gives up. Four benches face inward, leaving a hollow square in the middle. The class has been singing since before you arrived.</p><p>The chairman places an old book in your hands. <em>“We sing the notes before the words,”</em> he says. Then the class begins.</p>';
   const tune = TUNES[index];
   return `<p>${tune.scene}</p><p>The next number is called. The ink waits for your memory.</p>`;
 }
