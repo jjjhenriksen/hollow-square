@@ -1,0 +1,7 @@
+La Belle Aurore, regular weight 400.
+Bundled locally from the official Google Fonts CSS API on 2026-10-03.
+CSS: https://fonts.googleapis.com/css2?family=La+Belle+Aurore&display=swap
+Font source: https://fonts.gstatic.com/s/labelleaurore/v23/RrQIbot8-mNYKnGNDkWlocovHeIIGw.ttf
+Project: https://github.com/google/fonts/tree/main/ofl/labelleaurore
+License: LaBelleAurore-OFL.txt (SIL Open Font License 1.1).
+No remote font requests are made while playing.

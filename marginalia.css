@@ -1,56 +1,55 @@
-/* Caveat is bundled locally under the SIL Open Font License; see assets/fonts. */
+/* Locally bundled cursive; license and provenance live in assets/fonts. */
 @font-face {
-  font-family: 'Caveat';
-  src: url('assets/fonts/Caveat-notes.woff2') format('woff2');
+  font-family: 'La Belle Aurore';
+  src: url('assets/fonts/LaBelleAurore-notes.ttf') format('truetype');
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   font-display: swap;
 }
 
 #story-margin-note:empty,
 #practice-margin-note:empty { display: none; }
 
-#story-margin-note { margin: 0 0 24px; }
-#practice-margin-note { width: min(680px, 100%); margin: 0 auto 24px; }
+#story-margin-note { position: relative; margin: -12px 0 18px; }
+#practice-margin-note { position: relative; width: min(680px, 100%); margin: -8px auto 18px; }
 
 .margin-note {
-  position: relative;
-  width: fit-content;
-  max-width: min(17rem, 100%);
+  width: 8rem;
+  max-width: 100%;
   margin: 0 0 0 auto;
-  padding: 0 0 6px 34px;
-  color: var(--ink, #21170f);
-  font: 500 22px/1.2 'Caveat', 'Bradley Hand', cursive;
-  letter-spacing: .015em;
+  padding: 0;
+  color: #514535;
+  font: 400 15px/1.45 'La Belle Aurore', 'Bradley Hand', cursive;
+  letter-spacing: 0;
   text-align: left;
-  text-shadow: none;
-  transform: rotate(-1.4deg);
-  transform-origin: left center;
+  transform: rotate(-3deg);
+  transform-origin: center;
   overflow-wrap: break-word;
 }
 .margin-note p { margin: 0; }
-.margin-note-arrow {
-  position: absolute;
-  top: 4px;
-  left: 0;
-  width: 28px;
-  height: 23px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.15;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: .7;
-}
-.margin-note--practice { max-width: min(19rem, 100%); transform: rotate(.9deg); }
+.margin-note--practice { transform: rotate(2deg); }
 
-/* Offset the writing into the page's spare margin while keeping its height in
-   document flow. Narrow pages keep the entire note within their text measure. */
+/* Wide leaves have a true outer margin. Writing sits alongside the prose,
+   without interrupting its measure or creating a caption below the drawing. */
 @media (min-width: 1000px) {
-  #story-margin-note .margin-note { margin-right: -28px; }
-  #practice-margin-note .margin-note { margin-right: -18px; }
+  #story-margin-note { height: 0; margin: 0; }
+  #story-margin-note .margin-note {
+    position: absolute;
+    left: calc(100% + 16px);
+    top: 8px;
+    width: 90px;
+  }
+  #practice-margin-note { height: 0; margin: 0 auto; }
+  #practice-margin-note .margin-note {
+    position: absolute;
+    left: calc(100% + 14px);
+    top: -40px;
+    width: 76px;
+  }
 }
+
+/* On narrow leaves the small inscription uses the spare right-hand space
+   below the illustration. It stays in flow and never covers the story. */
 @media (max-width: 600px) {
-  .margin-note { margin-left: 12px; margin-right: 6px; max-width: calc(100% - 18px); transform: none; }
-  .margin-note--practice { max-width: calc(100% - 18px); }
+  .margin-note { font-size: 14px; width: 7.5rem; margin-right: 4px; }
 }
