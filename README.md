@@ -16,6 +16,15 @@ Open <http://localhost:8000> after the server starts.
 
 No package installation or build step is required.
 
+## Returning to the book
+
+The campaign saves a checkpoint whenever a story page opens. Return to that page
+from the title screen after leaving or reloading; the previous pages' bench losses
+and mistake count are preserved. The current phrase starts again from its beginning.
+Singing School does not replace campaign progress. **Begin again** starts a new run,
+and reaching either ending clears the checkpoint. Saves remain in this browser's
+local storage; if storage is blocked, returning works only during the current visit.
+
 ## Performance check
 
 The title screen defers the vendored notation renderer until a playable phrase

@@ -143,6 +143,61 @@ function loadSettings() {
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const screens = { title: $('#title'), story: $('#story'), practice: $('#practice'), game: $('#game'), end: $('#end') };
+const CAMPAIGN_KEY = 'hollow-square-campaign';
+let campaignCheckpoint = loadCampaignCheckpoint();
+let campaignCheckpointSaved = Boolean(campaignCheckpoint);
+
+function loadCampaignCheckpoint() {
+  try {
+    const checkpoint = JSON.parse(localStorage.getItem(CAMPAIGN_KEY));
+    if (!checkpoint || checkpoint.version !== 1 ||
+        !TUNES.some(tune => tune.sourceId === checkpoint.songId) ||
+        !Array.isArray(checkpoint.lost) || checkpoint.lost.length >= 4 ||
+        checkpoint.lost.some(voice => !['treble', 'alto', 'bass', 'tenor'].includes(voice)) ||
+        new Set(checkpoint.lost).size !== checkpoint.lost.length ||
+        !Number.isSafeInteger(checkpoint.totalMistakes) || checkpoint.totalMistakes < 0) return null;
+    return checkpoint;
+  } catch (_) { return null; }
+}
+
+function saveCampaignCheckpoint() {
+  if (state.mode !== 'campaign') return;
+  campaignCheckpoint = { version: 1, songId: currentTune().sourceId, lost: [...state.lost], totalMistakes: state.totalMistakes };
+  try {
+    localStorage.setItem(CAMPAIGN_KEY, JSON.stringify(campaignCheckpoint));
+    campaignCheckpointSaved = true;
+  } catch (_) { campaignCheckpointSaved = false; }
+}
+
+function clearCampaignCheckpoint() {
+  campaignCheckpoint = null;
+  try { localStorage.removeItem(CAMPAIGN_KEY); } catch (_) { /* Storage may be unavailable. */ }
+}
+
+function updateCampaignControls() {
+  const button = $('#continue-book');
+  button.hidden = !campaignCheckpoint;
+  if (campaignCheckpoint) {
+    const tune = TUNES.find(tune => tune.sourceId === campaignCheckpoint.songId);
+    button.querySelector('.choice-label').textContent = `Return to page ${tune.num.replace(/\s/g, '')}`;
+  }
+  $('#title [data-action="open-book"] .choice-label').textContent = campaignCheckpoint ? 'Begin again' : 'Open the Book';
+  $('#checkpoint-note').hidden = !campaignCheckpoint;
+  $('#checkpoint-note').textContent = campaignCheckpointSaved
+    ? 'Return to the last story page. Your place is saved in this browser.'
+    : 'Return to the last story page. This browser cannot save your place after a reload.';
+}
+
+function resumeCampaign() {
+  if (!campaignCheckpoint) return;
+  cancelRunWork();
+  state.mode = 'campaign'; state.phase = 'idle'; state.cursor = 0;
+  state.songIndex = TUNES.findIndex(tune => tune.sourceId === campaignCheckpoint.songId);
+  state.lost = [...campaignCheckpoint.lost]; state.totalMistakes = campaignCheckpoint.totalMistakes;
+  state.mistakes = 0; state.wrongHere = 0;
+  state.referenceUnlocked = state.songIndex > 0; state.harmonyUnlocked = state.songIndex > 0;
+  showStory(state.songIndex);
+}
 
 function currentTune() { return TUNES[state.songIndex]; }
 function referenceAvailable() { return state.mode === 'practice' || state.songIndex > 0 || state.referenceUnlocked; }
@@ -214,6 +269,7 @@ function firstSungIndex(notes) {
 }
 function activeHarmonyParts(tune) { return harmonyParts(tune).filter(part => !state.lost.includes(part.name)); }
 function showScreen(name) {
+  if (name === 'title') updateCampaignControls();
   Object.entries(screens).forEach(([key, node]) => { node.hidden = key !== name; node.classList.toggle('is-active', key === name); });
   state.screen = name;
   document.body.classList.toggle('on-title', name === 'title');
@@ -254,6 +310,7 @@ function showStory(index) {
   else illustration.after(margin);
   $('#story-reference-button').hidden = index === 0;
   $('#story-text').innerHTML = storyFor(index);
+  saveCampaignCheckpoint();
   showScreen('story');
 }
 
@@ -915,6 +972,7 @@ function finishTune() {
 }
 
 function finishGame(won) {
+  if (state.mode === 'campaign') clearCampaignCheckpoint();
   state.phase = 'done'; state.playToken++;
   $('#end-mark').textContent = won ? '✦' : '◼';
   $('#end-kicker').textContent = won ? 'parting hand · closing' : 'the square is broken';
@@ -970,6 +1028,7 @@ document.addEventListener('click', event => {
     if (action === 'home') { cancelRunWork(); state.mode = 'campaign'; state.phase = 'idle'; showScreen('title'); }
     if (action === 'toggle-mute') toggleMute();
     if (action === 'open-book') { initAudio(); resetCampaign(); }
+    if (action === 'continue-book') { initAudio(); resumeCampaign(); }
     if (action === 'open-school') { cancelRunWork(); state.mode = 'practice'; populatePractice(); showScreen('practice'); }
     if (action === 'begin-lesson') beginLesson();
     if (action === 'open-settings') openDrawer('#settings-drawer');
