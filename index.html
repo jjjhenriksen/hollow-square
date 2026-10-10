@@ -7,7 +7,7 @@
   <meta name="description" content="A browser-playable Sacred Harp horror game about song, memory, and the class that remains.">
   <title>Hollow Square — a Sacred Harp horror game</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
   <link rel="stylesheet" href="marginalia.css?v=3">
 </head>
 <body>
@@ -43,9 +43,11 @@
             <hr class="rule dbl">
             <div class="decl smallcaps legacy-meta">compiled in western georgia &nbsp;·&nbsp; first published 1844<br>this copy bears no date</div>
             <div class="choice-grid" aria-label="Choose how to begin">
+              <button class="choice" id="continue-book" type="button" data-action="continue-book" aria-describedby="checkpoint-note" hidden><span class="choice-label">Return to the Book</span></button>
               <button class="choice choice-primary" type="button" data-action="open-school"><span class="choice-label">Attend Singing School</span></button>
               <button class="choice" type="button" data-action="open-book"><span class="choice-label">Open the Book</span></button>
             </div>
+            <p class="checkpoint-note" id="checkpoint-note" hidden></p>
             <div class="keys-hint smallcaps">headphones recommended &nbsp;·&nbsp; keys: F · S · L · M</div>
             <button class="text-button" type="button" data-action="toggle-mute">Mute sound</button>
             <div class="warn">If you hear singing through the pines, you are already expected.</div>
@@ -182,6 +184,6 @@
   <script src="harmony-data.js?v=4"></script>
   <script src="artwork.js?v=7"></script>
   <script src="marginalia.js?v=4"></script>
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>

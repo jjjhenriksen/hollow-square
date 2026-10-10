@@ -443,6 +443,7 @@ h1 em { color: inherit; font-style: normal; }
 
 /* Keep the HTML hidden state authoritative for controls as well as screens. */
 [hidden] { display: none !important; }
+.checkpoint-note { max-width: 42ch; margin: 12px auto 0; font-size: 14px; line-height: 1.5; }
 :focus-visible { outline-color: #783a32; }
 
 /* Transparent watercolor vignettes let the actual page serve as their paper. */

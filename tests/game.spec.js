@@ -45,7 +45,7 @@ test('opening a fresh campaign restores all benches and the first-play cue', asy
   for (let miss = 0; miss < 3; miss++) await page.locator(`#shape-keys [data-shape="${wrongShape}"]`).click();
   await expect(page.locator('#bench-dots .lost')).toHaveCount(1);
   await page.locator('header [data-action="home"]').click();
-  await page.getByRole('button', { name: 'Open the Book' }).click();
+  await page.getByRole('button', { name: 'Begin again' }).click();
   await page.getByRole('button', { name: 'Take your place' }).click();
   await expect(page.locator('#shape-keys button:not(:disabled)').first()).toBeVisible({ timeout: 20_000 });
   await expect(page.locator('#first-play-cue')).toBeVisible();
